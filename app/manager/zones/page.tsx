@@ -18,8 +18,19 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { getZones, createZone, updateZone, deleteZone } from "@/lib/zone.api";
 import { getStaff } from "@/lib/staff.api";
-import type { Zone } from "@/types/zone";
+import type { Zone, NodeItem } from "@/types/zone";
 import type { Staff } from "@/types/staff";
+
+interface ZoneFormData {
+  name: string;
+  code: string;
+  zoneType: Zone["zoneType"];
+  coverageArea: string;
+  totalSubscribers: number;
+  assignedLead: string;
+  status: Zone["status"];
+  nodes: NodeItem[];
+}
 
 export default function ManagerZonesPage() {
   const { token } = useAuth();
@@ -36,7 +47,7 @@ export default function ManagerZonesPage() {
   const [error, setError] = useState("");
 
   // Form State
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ZoneFormData>({
     name: "",
     code: "",
     zoneType: "FIBER_FTTH",
@@ -564,14 +575,14 @@ export default function ManagerZonesPage() {
                       <input
                         type="text"
                         placeholder="Location"
-                        value={node.location}
+                        value={node.location || ""}
                         onChange={(e) => updateNodeField(i, "location", e.target.value)}
                         className="flex-1 rounded border border-slate-700 bg-slate-800 px-2 py-1 text-white"
                       />
                       <input
                         type="text"
                         placeholder="dBm (e.g. -18 dBm)"
-                        value={node.opticalPowerDbm}
+                        value={node.opticalPowerDbm || ""}
                         onChange={(e) => updateNodeField(i, "opticalPowerDbm", e.target.value)}
                         className="w-24 rounded border border-slate-700 bg-slate-800 px-2 py-1 text-white font-mono"
                       />

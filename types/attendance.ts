@@ -72,29 +72,36 @@ export type Attendance = {
 
 export type PauseShiftPayload = {
   duty?: string;
+  dutyId?: string;
   reason?: string;
   notes?: string;
 };
 
 export type ResumeShiftPayload = {
   duty?: string;
+  dutyId?: string;
   notes?: string;
 };
 
 export type CheckInPayload = {
   duty?: string;
+  dutyId?: string;
   zone?: string;
   location?: string;
+  locationCheckIn?: string;
   notes?: string;
   staff?: string;
 };
 
 export type CheckOutPayload = {
   duty?: string;
+  dutyId?: string;
   location?: string;
+  locationCheckOut?: string;
   notes?: string;
   staff?: string;
 };
+
 
 export type MarkAbsentPayload = {
   duty?: string;

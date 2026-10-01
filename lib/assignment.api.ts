@@ -290,13 +290,53 @@ export const completeDutyWorkOrder = async (
   return result.data.assignment;
 };
 
-export const updateAssignmentChecklist = toggleDutyChecklistItem;
-export const startTask = async (dutyId: string, taskId: string, token: string) => {
-  return getAssignmentById(dutyId, token);
+export const updateAssignmentChecklist = async (
+  dutyId: string,
+  checklist: Array<{ text: string; completed: boolean }>,
+  token: string
+): Promise<Assignment> => {
+  return updateAssignment(dutyId, { checklist }, token);
 };
-export const completeTask = async (dutyId: string, taskId: string, notes: string, token: string) => {
-  return getAssignmentById(dutyId, token);
+
+export const startTask = async (dutyId: string, token: string): Promise<Assignment> => {
+  try {
+    return await updateAssignment(dutyId, { status: "IN_PROGRESS" }, token);
+  } catch {
+    return await getAssignmentById(dutyId, token);
+  }
 };
+
+export const completeTask = async (
+  dutyId: string,
+  payload: { finalOpticalPowerDbm?: number | string; resolutionNotes?: string; notes?: string } = {},
+  token: string
+): Promise<Assignment> => {
+  return completeDutyWorkOrder(
+    dutyId,
+    {
+      finalOpticalPowerDbm:
+        payload.finalOpticalPowerDbm !== undefined
+          ? String(payload.finalOpticalPowerDbm)
+          : undefined,
+      resolutionSummary: payload.resolutionNotes || payload.notes,
+      notes: payload.notes,
+    },
+    token
+  );
+};
+
+export const updateAssignmentPayment = async (
+  dutyId: string,
+  payload: {
+    paymentStatus?: "PENDING" | "PAID" | "PROCESSING";
+    paymentReference?: string;
+    paidAt?: string;
+  },
+  token: string
+): Promise<Assignment> => {
+  return updateAssignment(dutyId, payload as UpdateAssignmentPayload, token);
+};
+
 export const getEventTaskProgress = async (eventId: string, token: string) => {
   return { tasks: [], summary: {} };
 };

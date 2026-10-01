@@ -11,6 +11,8 @@ export interface Zone {
   _id: string;
   name: string;
   code: string;
+  zoneName?: string;
+  zoneCode?: string;
   zoneType: "FIBER_FTTH" | "COAXIAL_GRID" | "HYBRID_HFC" | "COMMERCIAL_HUB" | "RESIDENTIAL_SECTOR";
   coverageArea: string;
   totalSubscribers: number;

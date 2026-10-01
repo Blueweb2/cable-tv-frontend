@@ -7,11 +7,13 @@ import type { Zone } from "./zone";
 
 export type AssignmentStatus =
   | "ASSIGNED"
+  | "PENDING_ACCEPTANCE"
   | "ACCEPTED"
   | "REJECTED"
   | "IN_PROGRESS"
   | "COMPLETED"
   | "CANCELLED";
+
 
 export type JobType =
   | "FIBER_SPLICING"
@@ -24,7 +26,13 @@ export type JobType =
   | "FIELD_PATROL"
   | "GENERAL_SHIFT";
 
-export type PriorityLevel = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL_OUTAGE";
+export type PriorityLevel =
+  | "LOW"
+  | "MEDIUM"
+  | "HIGH"
+  | "CRITICAL"
+  | "CRITICAL_OUTAGE"
+  | "URGENT";
 
 export type PhotoType =
   | "BEFORE_WORK"
@@ -110,7 +118,8 @@ export type Assignment = {
   siteLocation?: SiteLocation;
   problemDetails?: ProblemDetails;
   sitePhotos?: SitePhoto[];
-  finalOpticalPowerDbm?: string;
+  finalOpticalPowerDbm?: string | number;
+  completionNotes?: string;
   subscriber?: SubscriberInfo;
   dutyDate: string;
   startTime: string;

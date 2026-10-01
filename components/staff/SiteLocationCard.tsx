@@ -11,25 +11,36 @@ import {
   CheckCircle2,
   ExternalLink,
 } from "lucide-react";
-import type { Assignment } from "@/types/assignment";
+import type { Assignment, SiteLocation, ProblemDetails, JobType, SubscriberInfo } from "@/types/assignment";
 
 interface SiteLocationCardProps {
-  duty: Assignment;
+  duty?: Assignment;
+  location?: SiteLocation;
+  problem?: ProblemDetails;
+  jobType?: JobType;
+  subscriber?: SubscriberInfo;
 }
 
-export default function SiteLocationCard({ duty }: SiteLocationCardProps) {
-  const site = duty.siteLocation;
-  const problem = duty.problemDetails;
-  const subscriber = duty.subscriber;
+export default function SiteLocationCard({
+  duty,
+  location: propLocation,
+  problem: propProblem,
+  jobType: propJobType,
+  subscriber: propSubscriber,
+}: SiteLocationCardProps) {
+  const site = propLocation || duty?.siteLocation;
+  const problem = propProblem || duty?.problemDetails;
+  const subscriber = propSubscriber || duty?.subscriber;
+  const rawLocation = duty?.location || site?.address;
 
   // Build Google Maps Link
   const mapsUrl =
     site?.googleMapsUrl ||
     (site?.coordinates?.lat && site?.coordinates?.lng
       ? `https://www.google.com/maps?q=${site.coordinates.lat},${site.coordinates.lng}`
-      : site?.address || duty.location
+      : site?.address || rawLocation
       ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-          site?.address || duty.location || ""
+          site?.address || rawLocation || ""
         )}`
       : null);
 
@@ -103,14 +114,14 @@ export default function SiteLocationCard({ duty }: SiteLocationCardProps) {
         <div className="rounded-xl bg-slate-900/80 p-3 border border-slate-800">
           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Site Address</span>
           <p className="font-semibold text-white mt-0.5 line-clamp-2">
-            {site?.address || duty.location || "Sector Distribution Area"}
+            {site?.address || duty?.location || "Sector Distribution Area"}
           </p>
         </div>
 
         <div className="rounded-xl bg-slate-900/80 p-3 border border-slate-800">
           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Pole / Pillar #</span>
           <p className="font-bold text-[#00d2ff] mt-0.5 font-mono">
-            {site?.poleNumber || duty.nodeNumber || "Pillar Junction"}
+            {site?.poleNumber || duty?.nodeNumber || "Pillar Junction"}
           </p>
         </div>
 

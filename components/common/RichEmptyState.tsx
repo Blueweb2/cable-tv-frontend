@@ -6,7 +6,7 @@ import { FolderOpen, Sparkles, Plus } from "lucide-react";
 interface RichEmptyStateProps {
   title?: string;
   description?: string;
-  icon?: React.ReactNode;
+  icon?: React.ReactNode | React.ComponentType<{ size?: number; className?: string }>;
   actionLabel?: string;
   onAction?: () => void;
   secondaryActionLabel?: string;
@@ -16,16 +16,26 @@ interface RichEmptyStateProps {
 export default function RichEmptyState({
   title = "No records found",
   description = "There are currently no items to display. Try adjusting your filters or create a new entry.",
-  icon,
+  icon: IconProp,
   actionLabel,
   onAction,
   secondaryActionLabel,
   onSecondaryAction,
 }: RichEmptyStateProps) {
+  const renderIcon = () => {
+    if (!IconProp) return <FolderOpen size={32} />;
+    if (React.isValidElement(IconProp)) return IconProp;
+    if (typeof IconProp === "function" || typeof IconProp === "object") {
+      const IconComponent = IconProp as React.ComponentType<{ size?: number }>;
+      return <IconComponent size={32} />;
+    }
+    return <FolderOpen size={32} />;
+  };
+
   return (
-    <div className="flex min-h-64 flex-col items-center justify-center rounded-3xl border border-dashed border-[#e8e1d8] bg-white/70 p-8 text-center backdrop-blur-sm">
-      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#f4ebdd] to-[#e8dcc8] text-[#9a7b4f] shadow-sm">
-        {icon || <FolderOpen size={32} />}
+    <div className="flex min-h-64 flex-col items-center justify-center rounded-3xl border border-dashed border-slate-800 bg-[#0f172a]/60 p-8 text-center backdrop-blur-sm">
+      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-cyan-950/60 border border-cyan-500/30 text-cyan-400 shadow-sm">
+        {renderIcon()}
       </div>
 
       <h3 className="mt-4 text-lg font-bold text-[#29241f] sm:text-xl">{title}</h3>

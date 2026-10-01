@@ -66,9 +66,18 @@ export const checkOut = async (
 // ==========================================
 
 export const pauseStaffShift = async (
-  token: string,
-  payload: { duty?: string; reason?: string; notes?: string } = {}
+  arg1: string,
+  arg2?: { duty?: string; dutyId?: string; reason?: string; notes?: string } | string,
+  arg3?: string
 ): Promise<Attendance> => {
+  let token = arg1;
+  let payload = typeof arg2 === "object" ? arg2 : {};
+
+  if (typeof arg3 === "string") {
+    token = arg3;
+    payload = typeof arg2 === "object" ? arg2 : {};
+  }
+
   const result = await post<
     ApiResponse<{
       attendance: Attendance;
@@ -78,15 +87,19 @@ export const pauseStaffShift = async (
   return result.data.attendance;
 };
 
-// ==========================================
-// RESUME SHIFT
-// POST /api/attendance/resume
-// ==========================================
-
 export const resumeStaffShift = async (
-  token: string,
-  payload: { duty?: string; notes?: string } = {}
+  arg1: string,
+  arg2?: { duty?: string; dutyId?: string; notes?: string } | string,
+  arg3?: string
 ): Promise<Attendance> => {
+  let token = arg1;
+  let payload = typeof arg2 === "object" ? arg2 : {};
+
+  if (typeof arg3 === "string") {
+    token = arg3;
+    payload = typeof arg2 === "object" ? arg2 : {};
+  }
+
   const result = await post<
     ApiResponse<{
       attendance: Attendance;
@@ -139,6 +152,18 @@ export const markAttendance = async (
   >("/attendance", payload, token);
 
   return result.data.attendance;
+};
+
+// ==========================================
+// MARK ABSENT
+// POST /api/attendance
+// ==========================================
+
+export const markAbsent = async (
+  payload: MarkAbsentPayload | { duty?: string; staff?: string; notes?: string; date?: string; zone?: string },
+  token: string,
+): Promise<Attendance> => {
+  return markAttendance({ ...payload, status: "ABSENT" }, token);
 };
 
 // ==========================================

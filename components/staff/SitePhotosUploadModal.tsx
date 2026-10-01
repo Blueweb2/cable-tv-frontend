@@ -5,21 +5,32 @@ import { Camera, Upload, X, AlertCircle, Image as ImageIcon, Loader2 } from "luc
 import { uploadSitePhoto } from "@/lib/assignment.api";
 import type { Assignment, PhotoType } from "@/types/assignment";
 
+import { useAuth } from "@/hooks/useAuth";
+
 interface SitePhotosUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
-  duty: Assignment;
-  token: string;
-  onPhotoUploaded: (updatedDuty: Assignment) => void;
+  duty?: Assignment | null;
+  dutyId?: string;
+  dutyTitle?: string;
+  token?: string;
+  onPhotoUploaded?: (updatedDuty?: Assignment) => void;
 }
 
 export default function SitePhotosUploadModal({
   isOpen,
   onClose,
   duty,
-  token,
+  dutyId,
+  dutyTitle,
+  token: providedToken,
   onPhotoUploaded,
 }: SitePhotosUploadModalProps) {
+  const { token: authTok } = useAuth();
+  const token = providedToken || authTok || "";
+  const targetDutyId = dutyId || duty?._id || "";
+  const displayTitle = dutyTitle || duty?.dutyTitle || "Field Work Order";
+
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [caption, setCaption] = useState("");
@@ -55,17 +66,21 @@ export default function SitePhotosUploadModal({
       setError("Please select or capture a photo first.");
       return;
     }
+    if (!targetDutyId) {
+      setError("Work order ID is required to upload site photo.");
+      return;
+    }
 
     try {
       setUploading(true);
       setError(null);
       const res = await uploadSitePhoto(
-        duty._id,
+        targetDutyId,
         selectedFile,
         { caption, photoType },
         token
       );
-      onPhotoUploaded(res.duty);
+      if (onPhotoUploaded) onPhotoUploaded(res.duty);
       onClose();
     } catch (err: any) {
       setError(err.message || "Failed to upload site photo");

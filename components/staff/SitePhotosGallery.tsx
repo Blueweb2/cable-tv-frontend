@@ -6,6 +6,7 @@ import type { SitePhoto } from "@/types/assignment";
 
 interface SitePhotosGalleryProps {
   photos?: SitePhoto[];
+  title?: string;
   onDeletePhoto?: (photoId: string) => void;
   canDelete?: boolean;
 }
@@ -14,6 +15,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL?.replace("/api", "") || "http:/
 
 export default function SitePhotosGallery({
   photos = [],
+  title,
   onDeletePhoto,
   canDelete = false,
 }: SitePhotosGalleryProps) {

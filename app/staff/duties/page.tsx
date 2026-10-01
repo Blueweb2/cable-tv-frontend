@@ -127,13 +127,9 @@ export default function StaffDutiesPage() {
     if (!attendance) return map;
 
     attendance.forEach((rec) => {
-      if (Array.isArray(rec.duties)) {
-        rec.duties.forEach((d: any) => {
-          const dutyId = typeof d.duty === "string" ? d.duty : d.duty?._id;
-          if (dutyId) {
-            map.set(dutyId, { ...d, attendanceId: rec._id });
-          }
-        });
+      const dutyId = typeof rec.duty === "string" ? rec.duty : rec.duty?._id;
+      if (dutyId) {
+        map.set(dutyId, { ...rec, attendanceId: rec._id });
       }
     });
 
@@ -192,7 +188,7 @@ export default function StaffDutiesPage() {
     try {
       const location = await getLocation();
       await startTask(dutyId, token);
-      await staffCheckIn({ dutyId, locationCheckIn: location });
+      await staffCheckIn({ duty: dutyId, dutyId, location, locationCheckIn: location });
       setLocalDuties((prev) =>
         prev.map((d) => (d._id === dutyId ? { ...d, status: "IN_PROGRESS" } : d))
       );
@@ -209,10 +205,7 @@ export default function StaffDutiesPage() {
     if (!token) return;
     setProcessingId(dutyId);
     try {
-      const attRecord = attendanceDutyMap.get(dutyId);
-      if (attRecord?.attendanceId) {
-        await pauseStaffShift(attRecord.attendanceId, { dutyId, reason }, token);
-      }
+      await pauseStaffShift(token, { duty: dutyId, dutyId, reason });
       setPausingDutyId(null);
       await fetchAttendance();
     } catch (err) {
@@ -227,10 +220,7 @@ export default function StaffDutiesPage() {
     if (!token) return;
     setProcessingId(dutyId);
     try {
-      const attRecord = attendanceDutyMap.get(dutyId);
-      if (attRecord?.attendanceId) {
-        await resumeStaffShift(attRecord.attendanceId, { dutyId }, token);
-      }
+      await resumeStaffShift(token, { duty: dutyId, dutyId });
       await fetchAttendance();
     } catch (err) {
       console.error("Failed to resume shift:", err);
@@ -240,13 +230,13 @@ export default function StaffDutiesPage() {
   };
 
   // Handle Complete Task
-  const handleConfirmComplete = async (dutyId: string, finalOpticPower?: number, notes?: string) => {
+  const handleConfirmComplete = async (dutyId: string, finalOpticPower?: string | number, notes?: string) => {
     if (!token) return;
     setProcessingId(dutyId);
     try {
       const location = await getLocation();
       await completeTask(dutyId, { finalOpticalPowerDbm: finalOpticPower, resolutionNotes: notes }, token);
-      await staffCheckOut({ dutyId, locationCheckOut: location });
+      await staffCheckOut({ duty: dutyId, dutyId, location, locationCheckOut: location });
       setLocalDuties((prev) =>
         prev.map((d) =>
           d._id === dutyId
@@ -330,16 +320,14 @@ export default function StaffDutiesPage() {
               key={tab.id}
               type="button"
               onClick={() => setStatusFilter(tab.id)}
-              className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
-                statusFilter === tab.id
+              className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition cursor-pointer ${statusFilter === tab.id
                   ? "bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20"
                   : "text-slate-400 hover:text-white"
-              }`}
+                }`}
             >
               <span>{tab.label}</span>
-              <span className={`rounded-full px-1.5 py-0.2 text-[10px] font-black ${
-                statusFilter === tab.id ? "bg-slate-950/20 text-slate-950" : "bg-slate-800 text-slate-400"
-              }`}>
+              <span className={`rounded-full px-1.5 py-0.2 text-[10px] font-black ${statusFilter === tab.id ? "bg-slate-950/20 text-slate-950" : "bg-slate-800 text-slate-400"
+                }`}>
                 {tab.count}
               </span>
             </button>
@@ -373,7 +361,7 @@ export default function StaffDutiesPage() {
               ? "You do not have any field assignments assigned yet. The NOC or Operations Lead will dispatch work orders here."
               : `No work orders currently match the "${statusFilter}" filter.`
           }
-          icon={Activity}
+          icon={<Activity size={32} />}
         />
       )}
 
@@ -410,15 +398,14 @@ export default function StaffDutiesPage() {
               >
                 {/* Status Indicator Bar */}
                 <div
-                  className={`absolute top-0 left-0 right-0 h-1 ${
-                    isCompleted
+                  className={`absolute top-0 left-0 right-0 h-1 ${isCompleted
                       ? "bg-emerald-500"
                       : isCheckedIn
-                      ? "bg-cyan-400 animate-pulse"
-                      : isPendingAcceptance
-                      ? "bg-amber-400"
-                      : "bg-slate-700"
-                  }`}
+                        ? "bg-cyan-400 animate-pulse"
+                        : isPendingAcceptance
+                          ? "bg-amber-400"
+                          : "bg-slate-700"
+                    }`}
                 />
 
                 {/* Top Row: Job Title, Type & Actions */}
@@ -434,13 +421,12 @@ export default function StaffDutiesPage() {
 
                       {assignment.priority && (
                         <span
-                          className={`inline-flex items-center rounded-lg px-2 py-0.5 text-[10px] font-black uppercase tracking-wider ${
-                            assignment.priority === "CRITICAL"
+                          className={`inline-flex items-center rounded-lg px-2 py-0.5 text-[10px] font-black uppercase tracking-wider ${assignment.priority === "CRITICAL"
                               ? "bg-red-500/20 text-red-400 border border-red-500/30 animate-pulse"
                               : assignment.priority === "HIGH"
-                              ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
-                              : "bg-slate-800 text-slate-400 border border-slate-700"
-                          }`}
+                                ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
+                                : "bg-slate-800 text-slate-400 border border-slate-700"
+                            }`}
                         >
                           {assignment.priority} Priority
                         </span>
@@ -448,7 +434,7 @@ export default function StaffDutiesPage() {
 
                       {typeof assignment.zone === "object" && assignment.zone !== null && (
                         <span className="inline-flex items-center gap-1 rounded-lg bg-slate-900 border border-slate-700 px-2 py-0.5 text-[11px] font-semibold text-slate-300">
-                          📍 {assignment.zone.zoneName} (Node {assignment.nodeNumber || assignment.zone.zoneCode})
+                          📍 {assignment.zone.zoneName || assignment.zone.name} (Node {assignment.nodeNumber || assignment.zone.zoneCode || assignment.zone.code})
                         </span>
                       )}
                     </div>
@@ -470,23 +456,22 @@ export default function StaffDutiesPage() {
                     </button>
 
                     <span
-                      className={`inline-flex items-center rounded-xl px-3 py-1 text-xs font-black uppercase tracking-wider ${
-                        isCompleted
+                      className={`inline-flex items-center rounded-xl px-3 py-1 text-xs font-black uppercase tracking-wider ${isCompleted
                           ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
                           : isCheckedIn
-                          ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 animate-pulse"
-                          : isPendingAcceptance
-                          ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
-                          : "bg-slate-800 text-slate-400 border border-slate-700"
-                      }`}
+                            ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 animate-pulse"
+                            : isPendingAcceptance
+                              ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
+                              : "bg-slate-800 text-slate-400 border border-slate-700"
+                        }`}
                     >
                       {isCompleted
                         ? "Completed"
                         : isCheckedIn
-                        ? "In Progress"
-                        : isPendingAcceptance
-                        ? "Pending Acceptance"
-                        : assignment.status}
+                          ? "In Progress"
+                          : isPendingAcceptance
+                            ? "Pending Acceptance"
+                            : assignment.status}
                     </span>
                   </div>
                 </div>
@@ -500,11 +485,11 @@ export default function StaffDutiesPage() {
                       <p className="text-xs font-bold text-white truncate">
                         {assignment.dutyDate
                           ? new Date(assignment.dutyDate).toLocaleDateString("en-IN", {
-                              weekday: "short",
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                            })
+                            weekday: "short",
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })
                           : "Scheduled ASAP"}
                       </p>
                     </div>
@@ -535,6 +520,7 @@ export default function StaffDutiesPage() {
                 {/* Site Location & Problem Details Card */}
                 <div className="mt-4">
                   <SiteLocationCard
+                    duty={assignment}
                     location={assignment.siteLocation}
                     problem={assignment.problemDetails}
                     jobType={assignment.jobType}
@@ -583,13 +569,12 @@ export default function StaffDutiesPage() {
                           key={item._id || idx}
                           disabled={isCompleted}
                           onClick={() => handleToggleSubTask(assignment._id, idx)}
-                          className={`flex w-full items-start gap-3 rounded-xl border p-2.5 text-left text-xs transition cursor-pointer ${
-                            item.completed
+                          className={`flex w-full items-start gap-3 rounded-xl border p-2.5 text-left text-xs transition cursor-pointer ${item.completed
                               ? "border-emerald-500/30 bg-emerald-950/20 text-emerald-300"
                               : isCompleted
-                              ? "border-slate-800 bg-slate-900/40 text-slate-500 cursor-not-allowed"
-                              : "border-slate-800 bg-slate-900/90 text-slate-200 hover:border-slate-700"
-                          }`}
+                                ? "border-slate-800 bg-slate-900/40 text-slate-500 cursor-not-allowed"
+                                : "border-slate-800 bg-slate-900/90 text-slate-200 hover:border-slate-700"
+                            }`}
                         >
                           <span className="mt-0.5 shrink-0 text-cyan-400">
                             {item.completed ? (

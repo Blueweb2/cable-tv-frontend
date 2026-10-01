@@ -119,7 +119,7 @@ export default function HeroActiveShiftWidget({
     }
   };
 
-  const handlePause = async (reason: string, notes: string) => {
+  const handlePause = async (reason: string, notes?: string) => {
     if (!token) return;
     try {
       setActionLoading(true);
