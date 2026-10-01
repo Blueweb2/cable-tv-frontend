@@ -30,18 +30,10 @@ export default function ManagerDashboardPage() {
           <div>
             <div className="flex items-center gap-2">
               <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <p className="text-xs font-bold uppercase tracking-wider text-sky-400">
-                Cable & Broadband Network Operations Control (NOC)
-              </p>
+             
             </div>
 
-            <h1 className="mt-1 text-2xl font-black tracking-tight text-white sm:text-3xl">
-              Command Center 👋
-            </h1>
-
-            <p className="mt-1 text-xs sm:text-sm text-slate-400 max-w-xl">
-              Monitor active field technicians, dispatch line repair work orders, track node voltages & FTTH fiber splice operations.
-            </p>
+          
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5 shrink-0">
