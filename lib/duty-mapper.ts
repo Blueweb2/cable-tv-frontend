@@ -69,28 +69,56 @@ export function calculateHoursFromTime(startTime?: string, endTime?: string): nu
   return Math.round((diff / 60) * 100) / 100;
 }
 
-const getEvent = (assignment: Assignment) =>
-  typeof assignment.event === "string"
-    ? { _id: assignment.event }
-    : assignment.event;
+const getEvent = (assignment: Assignment) => {
+  if (!assignment.event) {
+    const zoneName =
+      assignment.zoneName ||
+      (typeof assignment.zone === "object" && assignment.zone ? (assignment.zone as any).name : "") ||
+      "Cable Network Zone";
+
+    return {
+      _id:
+        (typeof assignment.zone === "string"
+          ? assignment.zone
+          : (assignment.zone as any)?._id) || assignment._id,
+      eventName: zoneName,
+      location:
+        assignment.location ||
+        assignment.siteLocation?.address ||
+        assignment.siteLocation?.landmark ||
+        (typeof assignment.zone === "object" && assignment.zone ? (assignment.zone as any).coverageArea : "") ||
+        "Field Site",
+    };
+  }
+
+  if (typeof assignment.event === "string") {
+    return {
+      _id: assignment.event,
+      eventName: assignment.zoneName || "Field Zone",
+      location: assignment.location || "",
+    };
+  }
+
+  return assignment.event;
+};
 
 const getStaff = (assignment: Assignment) => {
   if (typeof assignment.staff === "string") {
     return {
       id: assignment.staff,
       _id: assignment.staff,
-      name: "Staff Member",
-      department: assignment.department || "General Staff",
+      name: "Technician",
+      department: assignment.department || "Field Operations",
     };
   }
 
-  const staffObj = assignment.staff as any;
+  const staffObj = (assignment.staff as any) || {};
   return {
     ...staffObj,
-    id: staffObj.id || staffObj._id,
-    _id: staffObj._id || staffObj.id,
-    name: staffObj.name || "Staff Member",
-    department: staffObj.department || assignment.department || "General Staff",
+    id: staffObj.id || staffObj._id || "",
+    _id: staffObj._id || staffObj.id || "",
+    name: staffObj.name || "Technician",
+    department: staffObj.department || assignment.department || "Field Operations",
   };
 };
 
@@ -116,21 +144,32 @@ export const mapAssignmentToDuty = (
   const rate = assignment.hourlyRate || 0;
   const computedAmount = assignment.totalAmount || (computedHours * rate);
 
+  const eventTitle =
+    event && typeof event === "object" && "eventName" in event && event.eventName
+      ? event.eventName
+      : assignment.zoneName || "Field Duty";
+
+  const resolvedLocation =
+    assignment.location ||
+    assignment.siteLocation?.address ||
+    (event && typeof event === "object" && "location" in event ? event.location : "") ||
+    "Field Site";
+
   return {
     id: assignment._id,
-    eventId: event._id,
-    title: assignment.dutyTitle,
-    event: "eventName" in event ? event.eventName : "Event unavailable",
+    eventId: event?._id || assignment._id,
+    title: assignment.dutyTitle || "Field Duty Assignment",
+    event: eventTitle,
     eventDate: formatDate(assignment.dutyDate),
     startTime: formatTime24to12(assignment.startTime),
     endTime: formatTime24to12(assignment.endTime),
-    location: "location" in event ? event.location : "",
+    location: resolvedLocation,
     staffId: staff.id,
     staffName: staff.name,
     description: assignment.description ?? "",
     status: assignment.status,
     rejectionReason: assignment.rejectionReason,
-    department: staff.department || assignment.department,
+    department: staff.department || assignment.department || "Field Operations",
     serviceName: assignment.serviceName,
     respondedAt: assignment.respondedAt,
     hourlyRate: rate,
