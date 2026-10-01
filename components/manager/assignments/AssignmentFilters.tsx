@@ -20,6 +20,7 @@ interface AssignmentFiltersProps {
 const filters: AssignmentFilter[] = [
   "All",
   "ASSIGNED",
+  "PENDING_ACCEPTANCE",
   "ACCEPTED",
   "IN_PROGRESS",
   "COMPLETED",
@@ -33,6 +34,7 @@ const filterLabels: Record<
 > = {
   All: "All",
   ASSIGNED: "Assigned",
+  PENDING_ACCEPTANCE: "Pending",
   ACCEPTED: "Accepted",
   IN_PROGRESS: "In Progress",
   COMPLETED: "Completed",

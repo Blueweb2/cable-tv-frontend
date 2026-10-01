@@ -103,7 +103,7 @@ export default function ManagerAttendancePage() {
     () =>
       new Map(
         attendance.map((item) => [
-          typeof item.duty === "string" ? item.duty : item.duty._id,
+          typeof item.duty === "string" ? item.duty : item.duty?._id || item._id,
           item,
         ])
       ),
@@ -119,11 +119,11 @@ export default function ManagerAttendancePage() {
         }))
         .filter(({ assignment, record }) => {
           const event =
-            typeof assignment.event === "string"
-              ? ""
-              : assignment.event.eventName;
+            typeof assignment.event === "object" && assignment.event
+              ? assignment.event.eventName || ""
+              : "";
           const staff =
-            typeof assignment.staff === "string" ? "" : assignment.staff.name;
+            typeof assignment.staff === "string" ? "" : assignment.staff?.name || "";
           const query = search.trim().toLowerCase();
           const matchesSearch =
             !query ||

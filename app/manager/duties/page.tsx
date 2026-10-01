@@ -187,7 +187,7 @@ function OperationsHubContent() {
       hourlyRate: Number(values.hourlyRate) || 0,
       checklist: values.checklist || [],
     };
-    if (editingDuty) await editAssignment(editingDuty.id, payload);
+    if (editingDuty) await editAssignment(editingDuty.id, payload as any);
     else await addAssignment(payload as any);
     closeModal();
   };

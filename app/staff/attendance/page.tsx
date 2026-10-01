@@ -76,7 +76,7 @@ export default function StaffAttendancePage() {
     () =>
       new Map(
         attendance.map((item) => [
-          typeof item.duty === "string" ? item.duty : item.duty._id,
+          typeof item.duty === "string" ? item.duty : item.duty?._id || item._id,
           item,
         ])
       ),
@@ -434,7 +434,7 @@ export default function StaffAttendancePage() {
                       <p className="text-xs font-bold text-[#29241f]">
                         {typeof record.duty === "string"
                           ? "Duty attendance"
-                          : record.duty.dutyTitle}
+                          : record.duty?.dutyTitle || "Duty attendance"}
                       </p>
                       <p className="mt-0.5 text-[11px] text-[#756d64]">
                         {dateLabel(record.date)} · In {timeLabel(record.checkIn)} · Out {timeLabel(record.checkOut)}

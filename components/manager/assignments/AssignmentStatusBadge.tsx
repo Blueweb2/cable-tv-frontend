@@ -20,6 +20,12 @@ const statusConfig: Record<
     dotClassName: "bg-[#B89563]",
   },
 
+  PENDING_ACCEPTANCE: {
+    label: "Pending",
+    className: "bg-amber-50 text-amber-600",
+    dotClassName: "bg-amber-500",
+  },
+
   ACCEPTED: {
     label: "Accepted",
     className: "bg-blue-50 text-blue-600",

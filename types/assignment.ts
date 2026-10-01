@@ -148,6 +148,13 @@ export type Assignment = {
   updatedAt: string;
 };
 
+export type AssignmentEvent = {
+  _id?: string;
+  eventName?: string;
+  location?: string;
+  [key: string]: any;
+};
+
 export type CreateAssignmentPayload = {
   zone?: string;
   zoneName?: string;
@@ -170,6 +177,7 @@ export type CreateAssignmentPayload = {
   hourlyRate?: number;
   notes?: string;
   checklist?: Array<{ text: string; completed?: boolean } | string>;
+  event?: any;
 };
 
 export type UpdateAssignmentPayload = Partial<CreateAssignmentPayload> & {

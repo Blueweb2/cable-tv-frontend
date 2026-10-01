@@ -4,6 +4,7 @@
 
 export type UserRole =
   | "admin"
+  | "manager"
   | "staff";
 
 // ==========================================
@@ -28,6 +29,8 @@ export type AuthUser = {
   email: string;
 
   phone?: string;
+
+  department?: string;
 
   location?: string;
 
