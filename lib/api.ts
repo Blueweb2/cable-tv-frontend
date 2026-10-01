@@ -1,7 +1,12 @@
 import { getAuthToken } from "@/lib/auth-storage";
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const getNormalizedApiUrl = () => {
+  const envUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+  const trimmed = envUrl.trim().replace(/\/+$/, "");
+  return trimmed.endsWith("/api") ? trimmed : `${trimmed}/api`;
+};
+
+const API_URL = getNormalizedApiUrl();
 
 export type ApiResponse<T> = {
   success: boolean;

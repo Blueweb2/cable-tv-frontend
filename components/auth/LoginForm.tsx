@@ -44,8 +44,10 @@ export default function LoginForm() {
     setError("");
 
     try {
-      const apiUrl =
+      const rawApiUrl =
         process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+      const trimmed = rawApiUrl.trim().replace(/\/+$/, "");
+      const apiUrl = trimmed.endsWith("/api") ? trimmed : `${trimmed}/api`;
 
       const response = await fetch(`${apiUrl}/auth/login`, {
         method: "POST",
@@ -179,23 +181,23 @@ export default function LoginForm() {
                 <button
                   type="button"
                   onClick={() => { 
-                    setEmail("admin@cableops.com");
-                    setPassword("admin123"); 
+                    setEmail("manager@cableops.com");
+                    setPassword("Password123!"); 
                   }}
                   className="rounded-lg bg-cyan-950/60 border border-cyan-500/30 px-3 py-1.5 text-left text-xs font-semibold text-cyan-300 transition hover:bg-cyan-900/50 cursor-pointer"
                 >
-                  📡 NOC Manager: <span className="font-mono text-white">admin@cableops.com</span>
+                  📡 Admin Manager: <span className="font-mono text-white">manager@cableops.com</span> (Password123!)
                 </button>
                   
                 <button
                   type="button"
                   onClick={() => { 
                     setEmail("rahul@cableops.com");
-                    setPassword("password123");
+                    setPassword("staff123");
                   }}
                   className="rounded-lg bg-blue-950/60 border border-blue-500/30 px-3 py-1.5 text-left text-xs font-semibold text-blue-300 transition hover:bg-blue-900/50 cursor-pointer" 
                 >
-                  ⚡ Field Tech: <span className="font-mono text-white">rahul@cableops.com</span>
+                  ⚡ Field Tech: <span className="font-mono text-white">rahul@cableops.com</span> (staff123)
                 </button>
               </div>
             </div>

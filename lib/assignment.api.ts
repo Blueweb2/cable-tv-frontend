@@ -16,8 +16,13 @@ import type {
   SitePhoto,
 } from "@/types/assignment";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const getBaseUrl = () => {
+  const url = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+  const trimmed = url.trim().replace(/\/+$/, "");
+  return trimmed.endsWith("/api") ? trimmed : `${trimmed}/api`;
+};
+
+const API_BASE_URL = getBaseUrl();
 
 // ==========================================
 // FILTER PARAMETERS
