@@ -64,14 +64,16 @@ export default function ManagerNotificationDrawer({
 
   const getCategoryIcon = (category: NotificationCategory) => {
     switch (category) {
-      case "EVENT":
-        return <Calendar size={16} className="text-[#9A6C37]" />;
+      case "OUTAGE":
+        return <AlertCircle size={16} className="text-rose-600" />;
+      case "DUTY":
+        return <FileText size={16} className="text-sky-600" />;
       case "FINANCE":
         return <CreditCard size={16} className="text-emerald-600" />;
-      case "ESTIMATE":
-        return <FileText size={16} className="text-blue-600" />;
+      case "STAFF":
+        return <Calendar size={16} className="text-amber-600" />;
       default:
-        return <AlertCircle size={16} className="text-amber-600" />;
+        return <AlertCircle size={16} className="text-sky-600" />;
     }
   };
 
@@ -184,14 +186,38 @@ export default function ManagerNotificationDrawer({
 
               <button
                 type="button"
-                onClick={() => setActiveFilter("EVENT")}
+                onClick={() => setActiveFilter("OUTAGE")}
                 className={`rounded-xl px-3 py-1 text-xs font-semibold transition ${
-                  activeFilter === "EVENT"
-                    ? "bg-[#9A6C37] text-white shadow-sm"
+                  activeFilter === "OUTAGE"
+                    ? "bg-rose-600 text-white shadow-sm"
                     : "bg-white text-[#756D64] border border-[#E8E1D8] hover:text-[#29241F]"
                 }`}
               >
-                Events
+                Outages
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveFilter("DUTY")}
+                className={`rounded-xl px-3 py-1 text-xs font-semibold transition ${
+                  activeFilter === "DUTY"
+                    ? "bg-sky-600 text-white shadow-sm"
+                    : "bg-white text-[#756D64] border border-[#E8E1D8] hover:text-[#29241F]"
+                }`}
+              >
+                Duties
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveFilter("STAFF")}
+                className={`rounded-xl px-3 py-1 text-xs font-semibold transition ${
+                  activeFilter === "STAFF"
+                    ? "bg-amber-600 text-white shadow-sm"
+                    : "bg-white text-[#756D64] border border-[#E8E1D8] hover:text-[#29241F]"
+                }`}
+              >
+                Staff
               </button>
 
               <button
@@ -204,18 +230,6 @@ export default function ManagerNotificationDrawer({
                 }`}
               >
                 Expenses
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setActiveFilter("ESTIMATE")}
-                className={`rounded-xl px-3 py-1 text-xs font-semibold transition ${
-                  activeFilter === "ESTIMATE"
-                    ? "bg-blue-600 text-white shadow-sm"
-                    : "bg-white text-[#756D64] border border-[#E8E1D8] hover:text-[#29241F]"
-                }`}
-              >
-                Estimates
               </button>
             </div>
           </div>

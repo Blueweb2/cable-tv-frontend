@@ -1,9 +1,17 @@
 import { api } from "./api";
 
 export type DashboardAnalytics = {
-  totalRevenue: number;
-  upcomingEventsVolume: number;
+  totalStaff: number;
+  activeShifts: number;
+  totalDutiesToday: number;
+  inProgressDuties: number;
+  completedDuties: number;
+  criticalOutages: number;
   totalStaffHours: number;
+  totalZones: number;
+  operationalZones: number;
+  totalExpenses: number;
+  jobTypeBreakdown: Array<{ _id: string; count: number }>;
 };
 
 export type AnalyticsResponse = {

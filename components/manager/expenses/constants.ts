@@ -1,19 +1,21 @@
-export type ExpenseStatus = "Paid" | "Pending";
+export type ExpenseStatus = "Paid" | "Pending" | "Approved" | "Rejected";
 
 export type PaymentMethod =
   | "Cash"
   | "Bank Transfer"
   | "UPI"
   | "Card"
+  | "Petty Cash"
   | "Other";
 
 export type ExpenseCategory =
-  | "Food"
-  | "Decoration"
-  | "Staff"
-  | "Transport"
-  | "Venue"
-  | "Equipment"
+  | "Fuel & Transit"
+  | "Fiber & Cable Material"
+  | "Connectors & Hardware"
+  | "Node & Amplifier Spares"
+  | "Tools & Safety Gear"
+  | "Staff Allowance"
+  | "Emergency Outage Food"
   | "Other";
 
 export interface Expense {
@@ -21,8 +23,12 @@ export interface Expense {
   title: string;
   category: ExpenseCategory;
   amount: number;
-  event: string;
+  event?: string;
   eventId?: string;
+  zone?: string;
+  zoneId?: string;
+  zoneName?: string;
+  duty?: string;
   date: string;
   paymentMethod: PaymentMethod;
   status: ExpenseStatus;
@@ -30,124 +36,123 @@ export interface Expense {
 }
 
 export const expenseCategories: ExpenseCategory[] = [
-  "Food",
-  "Decoration",
-  "Staff",
-  "Transport",
-  "Venue",
-  "Equipment",
+  "Fuel & Transit",
+  "Fiber & Cable Material",
+  "Connectors & Hardware",
+  "Node & Amplifier Spares",
+  "Tools & Safety Gear",
+  "Staff Allowance",
+  "Emergency Outage Food",
   "Other",
 ];
 
 export const paymentMethods: PaymentMethod[] = [
+  "UPI",
   "Cash",
   "Bank Transfer",
-  "UPI",
   "Card",
+  "Petty Cash",
   "Other",
 ];
 
 export const expenseStatuses: ExpenseStatus[] = [
-  "Paid",
+  "Approved",
   "Pending",
+  "Rejected",
+  "Paid",
 ];
 
 export const expenses: Expense[] = [
   {
     id: "EXP-001",
-    title: "Decoration Materials",
-    category: "Decoration",
-    amount: 35000,
-    event: "Wedding Celebration",
+    title: "24-Core Armored Fiber Reel (500m)",
+    category: "Fiber & Cable Material",
+    amount: 18500,
+    event: "North Sector FTTH",
+    zoneName: "North Sector FTTH",
     date: "Sep 10, 2026",
     paymentMethod: "Bank Transfer",
-    status: "Paid",
+    status: "Approved",
     description:
-      "Flowers, stage decoration materials, lighting accessories, and setup items.",
+      "Replacement fiber spool for main trunk line repair after municipal road digging.",
   },
   {
     id: "EXP-002",
-    title: "Catering Supplies",
-    category: "Food",
-    amount: 28000,
-    event: "Wedding Celebration",
+    title: "Fusion Splicer Electrode & Cleaver Blades",
+    category: "Tools & Safety Gear",
+    amount: 6200,
+    event: "Central NOC Station",
+    zoneName: "Central NOC Station",
     date: "Sep 11, 2026",
     paymentMethod: "UPI",
-    status: "Paid",
+    status: "Approved",
     description:
-      "Vegetables, rice, spices, dairy products, and other catering supplies.",
+      "Consumable spare electrodes for Fujikura 70S core alignment splicer.",
   },
   {
     id: "EXP-003",
-    title: "Staff Payment",
-    category: "Staff",
-    amount: 18000,
-    event: "Birthday Celebration",
+    title: "Field Technician Bike Fuel Reimbursement",
+    category: "Fuel & Transit",
+    amount: 2400,
+    event: "East Distribution Area",
+    zoneName: "East Distribution Area",
     date: "Sep 14, 2026",
     paymentMethod: "Cash",
-    status: "Paid",
+    status: "Approved",
     description:
-      "Event staff payment for setup, guest coordination, and service.",
+      "Weekly transit allowance for 4 emergency linesman subscriber visits.",
   },
   {
     id: "EXP-004",
-    title: "Transport Charges",
-    category: "Transport",
-    amount: 7500,
-    event: "Corporate Conference",
+    title: "CAT6 Patch Cords & SC/APC Fast Connectors (100 pk)",
+    category: "Connectors & Hardware",
+    amount: 4800,
+    event: "West Residential Zone",
+    zoneName: "West Residential Zone",
     date: "Sep 17, 2026",
-    paymentMethod: "Bank Transfer",
+    paymentMethod: "UPI",
     status: "Pending",
     description:
-      "Transportation for event equipment and staff.",
+      "Fast connectors and subscriber patch cords for FTTH drop activations.",
   },
   {
     id: "EXP-005",
-    title: "Venue Equipment Rental",
-    category: "Equipment",
-    amount: 22000,
-    event: "Corporate Conference",
+    title: "Trunk Line Optical Node Power Supply 60V",
+    category: "Node & Amplifier Spares",
+    amount: 9500,
+    event: "North Industrial Park",
+    zoneName: "North Industrial Park",
     date: "Sep 16, 2026",
     paymentMethod: "Card",
-    status: "Paid",
+    status: "Approved",
     description:
-      "Projector, microphones, speakers, and conference equipment rental.",
+      "Ferroresonant outdoor power supply replacement after lightning surge.",
   },
   {
     id: "EXP-006",
-    title: "Venue Advance",
-    category: "Venue",
-    amount: 40000,
-    event: "Engagement Ceremony",
+    title: "Overtime Staff Allowance for Major Outage Restoration",
+    category: "Staff Allowance",
+    amount: 7500,
+    event: "Highway Sector Outage",
+    zoneName: "Highway Sector Outage",
     date: "Sep 19, 2026",
     paymentMethod: "Bank Transfer",
     status: "Pending",
     description:
-      "Advance payment made toward the engagement venue.",
+      "Night shift emergency splice crew allowance for 6 linesmen.",
   },
   {
     id: "EXP-007",
-    title: "Flower Arrangement",
-    category: "Decoration",
-    amount: 12500,
-    event: "Engagement Ceremony",
+    title: "Midnight Outage Crew Food & Water Supplies",
+    category: "Emergency Outage Food",
+    amount: 1800,
+    event: "East Grid Breakdown",
+    zoneName: "East Grid Breakdown",
     date: "Sep 20, 2026",
     paymentMethod: "UPI",
-    status: "Paid",
+    status: "Approved",
     description:
-      "Fresh flowers and table arrangements.",
-  },
-  {
-    id: "EXP-008",
-    title: "Cleaning Service",
-    category: "Staff",
-    amount: 6000,
-    event: "Birthday Celebration",
-    date: "Sep 15, 2026",
-    paymentMethod: "Cash",
-    status: "Paid",
-    description:
-      "Pre-event and post-event cleaning service.",
+      "Refreshments and water during all-night optical trunk restoration.",
   },
 ];
 

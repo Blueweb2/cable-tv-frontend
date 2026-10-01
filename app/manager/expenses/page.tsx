@@ -23,9 +23,11 @@ import {
   updateExpense,
   type ExpensePayload,
 } from "@/lib/expense.api";
-import { getEvents } from "@/lib/event.api";
+import { getZones } from "@/lib/zone.api";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function ExpensesPage() {
+  const { token } = useAuth();
   const [expenseList, setExpenseList] = useState<Expense[]>([]);
   const [eventOptions, setEventOptions] = useState<{ id: string; name: string }[]>([]);
   const [eventFilter, setEventFilter] = useState("All");
@@ -58,16 +60,16 @@ export default function ExpensesPage() {
     try {
       setLoading(true);
       setError("");
-      const [expenses, eventsRes] = await Promise.all([
+      const [expenses, zonesRes] = await Promise.all([
         getExpenses(),
-        getEvents({ limit: 100 }).catch(() => ({ data: [] })),
+        token ? getZones(token, { limit: 100 }).catch(() => ({ data: [] })) : Promise.resolve({ data: [] }),
       ]);
       setExpenseList(expenses);
-      if (eventsRes && Array.isArray(eventsRes.data)) {
+      if (zonesRes && Array.isArray(zonesRes.data)) {
         setEventOptions(
-          eventsRes.data.map((evt) => ({
-            id: evt._id,
-            name: evt.eventName,
+          zonesRes.data.map((z) => ({
+            id: z._id,
+            name: `${z.name} (${z.code})`,
           }))
         );
       }
@@ -81,17 +83,18 @@ export default function ExpensesPage() {
   useEffect(() => {
     const timer = window.setTimeout(() => void fetchExpenses(), 0);
     return () => window.clearTimeout(timer);
-  }, []);
+  }, [token]);
 
   const filteredExpenses = useMemo(() => {
     const query = search.trim().toLowerCase();
     const selectedEventObj = eventOptions.find((e) => e.id === eventFilter);
 
     return expenseList.filter((expense) => {
+      const expenseScope = (expense.zoneName || expense.event || "").toLowerCase();
       const matchesSearch =
         !query ||
         expense.title.toLowerCase().includes(query) ||
-        expense.event.toLowerCase().includes(query) ||
+        expenseScope.includes(query) ||
         expense.category.toLowerCase().includes(query) ||
         expense.id.toLowerCase().includes(query);
 
@@ -109,9 +112,10 @@ export default function ExpensesPage() {
 
       const matchesEvent =
         eventFilter === "All" ||
+        expense.zoneId === eventFilter ||
         expense.eventId === eventFilter ||
         (selectedEventObj &&
-          expense.event.toLowerCase() === selectedEventObj.name.toLowerCase());
+          expenseScope === selectedEventObj.name.toLowerCase());
 
       return (
         matchesSearch &&

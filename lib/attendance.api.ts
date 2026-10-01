@@ -206,10 +206,3 @@ export const checkOutStaff = async (
   token: string,
   payload: CheckOutPayload,
 ): Promise<Attendance> => checkOut(payload, token);
-
-export const getEventStaffAttendance = async (
-  token: string,
-  eventId: string
-): Promise<any[]> => {
-  return [];
-};

@@ -50,13 +50,13 @@ export default function ShiftNotificationsFeed({ assignments }: ShiftNotificatio
       const completed = item.checklist.filter((c) => c.completed).length;
       items.push({
         id: `notif-checklist-${item._id}-${idx}`,
-        title: `Sub-Task Checklist: ${item.dutyTitle}`,
-        message: `Manager assigned ${item.checklist.length} event subtasks (${completed}/${item.checklist.length} completed). Click to inspect & check off tasks.`,
+        title: `SOP Checklist: ${item.dutyTitle}`,
+        message: `Manager assigned ${item.checklist.length} field SOP items (${completed}/${item.checklist.length} completed). Click to inspect & check off tasks.`,
         timestamp: "Recently assigned",
         type: "CHECKLIST",
         read: false,
         targetId: "duty-checklist",
-        actionText: "View Sub-Tasks →",
+        actionText: "View Checklist →",
       });
     }
 
@@ -65,7 +65,7 @@ export default function ShiftNotificationsFeed({ assignments }: ShiftNotificatio
       items.push({
         id: `notif-assign-${item._id}-${idx}`,
         title: `Action Required: Accept Shift - ${item.dutyTitle}`,
-        message: `You have been assigned to ${event?.eventName || "Event"} on ${dateFormatted}. Please review & accept your duty shift.`,
+        message: `You have been assigned to ${item.zoneName || "Field Duty"} on ${dateFormatted}. Please review & accept your duty shift.`,
         timestamp: "1 hour ago",
         type: "ASSIGNMENT",
         read: false,

@@ -7,15 +7,12 @@ export * from "./auth";
 export * from "./assignment";
 export * from "./attendance";
 export * from "./availability";
-export * from "./booking";
-export * from "./estimate";
-export * from "./event";
 export * from "./expense";
-export * from "./food";
 export * from "./report";
 export * from "./service";
 export * from "./staff";
 export * from "./task";
+export * from "./zone";
 
 /**
  * Unified MongoId Helper Type

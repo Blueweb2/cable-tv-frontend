@@ -72,46 +72,6 @@ export interface DepartmentSummaryItem {
   staff: DepartmentStaffMember[];
 }
 
-export interface EventStaffingResponse {
-  event: {
-    id: string;
-    eventName: string;
-    eventType: string;
-    eventDate: string;
-    eventTime: string;
-    guests: number;
-    location: string;
-    status: string;
-    client?: {
-      _id: string;
-      name: string;
-      phone: string;
-      email: string;
-    };
-    hasCatering: boolean;
-    foodMenu?: {
-      included: boolean;
-      servingType: string;
-      ratePerGuest: number;
-      totalFoodAmount: number;
-      notes: string;
-      items: Array<{
-        name: string;
-        category: string;
-        dietary: string;
-        quantity: number;
-        rate: number;
-        amount: number;
-      }>;
-    };
-    servicesCount: number;
-  };
-  targetDate: string;
-  staffingStreams: StaffingStream[];
-  departmentSummary: DepartmentSummaryItem[];
-  allStaffPool: DepartmentStaffMember[];
-}
-
 export interface DateAvailabilityResponse {
   date: string;
   totalStaff: number;
@@ -120,19 +80,6 @@ export interface DateAvailabilityResponse {
   assignedStaff: number;
   departments: DepartmentSummaryItem[];
   staff: DepartmentStaffMember[];
-}
-
-/**
- * Get dynamic event staffing requirements & department availability for an event
- */
-export async function getEventStaffingRequirements(
-  eventId: string,
-  token?: string
-): Promise<ApiResponse<EventStaffingResponse>> {
-  return get<ApiResponse<EventStaffingResponse>>(
-    `/departments/event-staffing/${eventId}`,
-    token
-  );
 }
 
 /**

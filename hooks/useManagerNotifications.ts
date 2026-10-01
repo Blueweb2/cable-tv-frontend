@@ -1,13 +1,11 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { getEvents } from "@/lib/event.api";
 import { getExpenses } from "@/lib/expense.api";
-import { getEstimates } from "@/lib/estimates.api";
 import { getAssignments } from "@/lib/assignment.api";
 import { useAuth } from "@/hooks/useAuth";
 
-export type NotificationCategory = "ACTION" | "EVENT" | "FINANCE" | "ESTIMATE" | "STAFF";
+export type NotificationCategory = "ACTION" | "DUTY" | "FINANCE" | "OUTAGE" | "STAFF";
 
 export interface ManagerNotification {
   id: string;
@@ -21,8 +19,8 @@ export interface ManagerNotification {
   priority: "HIGH" | "MEDIUM" | "LOW";
 }
 
-const STORAGE_KEY = "event_manager_read_notifs";
-const DISMISSED_KEY = "event_manager_dismissed_notifs";
+const STORAGE_KEY = "cableops_manager_read_notifs";
+const DISMISSED_KEY = "cableops_manager_dismissed_notifs";
 
 export function useManagerNotifications() {
   const { token } = useAuth();
@@ -54,28 +52,41 @@ export function useManagerNotifications() {
     try {
       setLoading(true);
 
-      const [eventsRes, expensesRes, estimatesRes, assignmentsRes] = await Promise.allSettled([
-        getEvents({ status: "Upcoming", limit: 10 }, token),
+      const [expensesRes, assignmentsRes] = await Promise.allSettled([
         getExpenses(),
-        getEstimates({ limit: 10 }),
         getAssignments(token, { limit: 50 }),
       ]);
 
       const items: ManagerNotification[] = [];
-      const now = new Date();
 
-      // 0. Staff Shift Rejections (Urgent Alert for Reassignment) & Pending Responses
+      // 1. Staff Shift Rejections & Pending Duty Confirmations & Critical Outages
       if (assignmentsRes.status === "fulfilled" && assignmentsRes.value?.data) {
         assignmentsRes.value.data.forEach((duty) => {
-          const staffName = typeof duty.staff === "object" ? duty.staff.name : "Staff member";
-          const eventName = typeof duty.event === "object" ? duty.event.eventName : "Event";
+          const staffName = typeof duty.staff === "object" ? duty.staff.name : "Technician";
+          const zoneName = duty.zoneName || "Field Zone";
 
+          // Critical Outage Alert
+          if (duty.priority === "CRITICAL_OUTAGE" && duty.status !== "COMPLETED") {
+            items.push({
+              id: `outage-alert-${duty._id}`,
+              category: "OUTAGE",
+              title: `⚡ CRITICAL OUTAGE: ${duty.dutyTitle}`,
+              message: `${zoneName}: Immediate technician attention required. Status is currently ${duty.status.replace("_", " ")}.`,
+              timestamp: duty.dutyDate || duty.createdAt,
+              timeAgo: "Urgent",
+              link: `/manager/duties`,
+              read: false,
+              priority: "HIGH",
+            });
+          }
+
+          // Technician Declined Shift
           if (duty.status === "REJECTED") {
             items.push({
               id: `duty-rejected-${duty._id}`,
               category: "STAFF",
               title: `🚨 Shift Declined: ${staffName}`,
-              message: `${staffName} declined "${duty.dutyTitle}" for ${eventName}. Reason: "${duty.rejectionReason || "Unavailable"}". Click to reassign.`,
+              message: `${staffName} declined "${duty.dutyTitle}" (${zoneName}). Reason: "${duty.rejectionReason || "Unavailable"}". Click to reassign.`,
               timestamp: duty.respondedAt || duty.updatedAt || duty.dutyDate,
               timeAgo: "Action Required",
               link: `/manager/duties`,
@@ -83,11 +94,12 @@ export function useManagerNotifications() {
               priority: "HIGH",
             });
           } else if (duty.status === "ASSIGNED") {
+            // Awaiting confirmation
             items.push({
               id: `duty-pending-${duty._id}`,
-              category: "STAFF",
+              category: "DUTY",
               title: `⏳ Pending Confirmation: ${staffName}`,
-              message: `Awaiting shift confirmation from ${staffName} for "${duty.dutyTitle}" (${eventName}).`,
+              message: `Awaiting shift acceptance from ${staffName} for "${duty.dutyTitle}" (${zoneName}).`,
               timestamp: duty.createdAt || duty.dutyDate,
               timeAgo: "Pending Response",
               link: `/manager/duties`,
@@ -98,34 +110,7 @@ export function useManagerNotifications() {
         });
       }
 
-      // 1. Upcoming Events (events occurring within 72 hours)
-      if (eventsRes.status === "fulfilled" && eventsRes.value?.data) {
-        eventsRes.value.data.forEach((evt) => {
-          const eventDate = new Date(evt.eventDate);
-          const diffHours = (eventDate.getTime() - now.getTime()) / (1000 * 60 * 60);
-
-          if (diffHours >= -12 && diffHours <= 72) {
-            const isToday = eventDate.toDateString() === now.toDateString();
-            const timingText = isToday
-              ? `Today at ${evt.eventTime || "scheduled time"}`
-              : `in ${Math.max(1, Math.round(diffHours / 24))} days`;
-
-            items.push({
-              id: `evt-upcoming-${evt._id}`,
-              category: "EVENT",
-              title: isToday ? `⚡ Event Happening Today: ${evt.eventName}` : `Upcoming Event: ${evt.eventName}`,
-              message: `${evt.eventName} with ${evt.guests} guests is scheduled ${timingText} at ${evt.location}.`,
-              timestamp: evt.eventDate,
-              timeAgo: isToday ? "Today" : "Coming up",
-              link: `/manager/events/${evt._id}`,
-              read: false,
-              priority: isToday ? "HIGH" : "MEDIUM",
-            });
-          }
-        });
-      }
-
-      // 2. Pending Expenses needing manager attention
+      // 2. Pending Expenses Needing Manager Approval
       if (expensesRes.status === "fulfilled" && Array.isArray(expensesRes.value)) {
         const pendingExpenses = expensesRes.value.filter((exp) => exp.status === "Pending");
         pendingExpenses.slice(0, 5).forEach((exp) => {
@@ -133,43 +118,23 @@ export function useManagerNotifications() {
             id: `exp-pending-${exp.id}`,
             category: "FINANCE",
             title: `Pending Expense: ₹${exp.amount.toLocaleString("en-IN")}`,
-            message: `Expense "${exp.title}" (${exp.category}) for ${exp.event} is awaiting settlement.`,
+            message: `Claim for "${exp.title}" (${exp.category}) is awaiting manager review.`,
             timestamp: exp.date,
             timeAgo: "Awaiting Action",
             link: `/manager/expenses`,
             read: false,
-            priority: exp.amount > 50000 ? "HIGH" : "MEDIUM",
+            priority: exp.amount > 10000 ? "HIGH" : "MEDIUM",
           });
         });
       }
 
-      // 3. New Estimates in DRAFT or SENT stage
-      if (estimatesRes.status === "fulfilled" && estimatesRes.value?.data) {
-        const activeEstimates = estimatesRes.value.data.filter(
-          (est) => est.status === "DRAFT" || est.status === "SENT"
-        );
-        activeEstimates.slice(0, 5).forEach((est) => {
-          items.push({
-            id: `est-review-${est._id}`,
-            category: "ESTIMATE",
-            title: `Review Estimate: ${est.estimateNumber}`,
-            message: `Estimate for "${est.eventName}" (₹${est.total.toLocaleString("en-IN")}) is in ${est.status} status.`,
-            timestamp: est.createdAt,
-            timeAgo: "Active Proposal",
-            link: `/manager/estimates`,
-            read: false,
-            priority: "LOW",
-          });
-        });
-      }
-
-      // Fallback notification if system is fresh
+      // Fallback notification if clear
       if (items.length === 0) {
         items.push({
           id: "sys-ready-1",
           category: "ACTION",
-          title: "All Systems Running Smoothly",
-          message: "No pending alerts or overdue shifts. Your event operations are fully up to date.",
+          title: "All Field Operations Running Smoothly",
+          message: "No pending alerts, outages, or unassigned duties. Network operations are fully up to date.",
           timestamp: new Date().toISOString(),
           timeAgo: "Just now",
           link: "/manager",
@@ -180,7 +145,7 @@ export function useManagerNotifications() {
 
       setRawNotifications(items);
     } catch {
-      // Keep existing
+      // Keep existing notifications
     } finally {
       setLoading(false);
     }
@@ -188,8 +153,7 @@ export function useManagerNotifications() {
 
   useEffect(() => {
     void fetchLiveNotifications();
-    // Re-check periodically every 60 seconds
-    const interval = setInterval(fetchLiveNotifications, 60000);
+    const interval = setInterval(fetchLiveNotifications, 30000);
     return () => clearInterval(interval);
   }, [fetchLiveNotifications]);
 

@@ -124,9 +124,9 @@ export default function ExpenseCard({
           />
 
           <div className="min-w-0">
-            <p className="text-xs text-[#9b938a]">Event</p>
+            <p className="text-xs text-[#9b938a]">Zone / Scope</p>
             <p className="truncate text-sm font-medium text-[#403a34]">
-              {expense.event}
+              {expense.zoneName || expense.event || "General Field Ops"}
             </p>
           </div>
         </div>

@@ -280,9 +280,8 @@ export default function StaffProfile({
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {duties.map((duty) => {
-                      const eventObj = typeof duty.event === "string" ? null : duty.event;
-                      const eventName = eventObj?.eventName || "Event Shift";
-                      const location = eventObj?.location || "";
+                      const zoneName = duty.zoneName || (typeof duty.zone === "object" && duty.zone ? (duty.zone as any).name : "") || "Field Operations";
+                      const location = duty.location || duty.siteLocation?.address || "";
 
                       let hours = duty.totalHours || calculateHoursFromTime(duty.startTime, duty.endTime);
                       const rate = duty.hourlyRate || 0;
@@ -297,7 +296,7 @@ export default function StaffProfile({
                             </div>
                           </td>
                           <td className="px-4 py-3">
-                            <p className="font-bold text-gray-900">{eventName}</p>
+                            <p className="font-bold text-gray-900">{zoneName}</p>
                             {location && <p className="text-[10px] text-gray-500">{location}</p>}
                           </td>
                           <td className="px-4 py-3">

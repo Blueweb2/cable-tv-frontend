@@ -18,15 +18,18 @@ interface AddExpenseModalProps {
   onSave: (expense: Expense) => Promise<void>;
   editingExpense?: Expense | null;
   events?: { id: string; name: string }[];
+  zones?: { id: string; name: string }[];
 }
 
 const emptyExpense: Expense = {
   id: "",
   title: "",
-  category: "Food",
+  category: "Fuel & Transit",
   amount: 0,
   event: "",
   eventId: "",
+  zoneName: "",
+  zoneId: "",
   date: "",
   paymentMethod: "UPI",
   status: "Pending",
@@ -39,10 +42,13 @@ export default function AddExpenseModal({
   onSave,
   editingExpense,
   events = [],
+  zones = [],
 }: AddExpenseModalProps) {
   const [form, setForm] = useState<Expense>(emptyExpense);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+
+  const activeZones = zones.length > 0 ? zones : events;
 
   useEffect(() => {
     if (editingExpense) {
@@ -66,16 +72,17 @@ export default function AddExpenseModal({
     }));
   };
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
+    const targetScope = (form.zoneName || form.event || "").trim();
     if (
       !form.title.trim() ||
-      !form.event.trim() ||
+      !targetScope ||
       !form.date ||
       form.amount <= 0
     ) {
-      setError("Please complete the title, amount, event, and date.");
+      setError("Please complete the title, amount, zone/work order, and date.");
       return;
     }
 
@@ -85,7 +92,8 @@ export default function AddExpenseModal({
         editingExpense?.id ||
         `EXP-${Date.now().toString().slice(-6)}`,
       title: form.title.trim(),
-      event: form.event.trim(),
+      event: targetScope,
+      zoneName: targetScope,
       description: form.description.trim(),
     };
 
@@ -109,11 +117,11 @@ export default function AddExpenseModal({
             <h2 className="text-lg font-bold text-[#29241f]">
               {editingExpense
                 ? "Edit Expense"
-                : "Add Expense"}
+                : "Add Field Expense"}
             </h2>
 
             <p className="mt-0.5 text-xs text-[#9b938a]">
-              Record event-related spending.
+              Record field, network zone, or transit operational spending.
             </p>
           </div>
 
@@ -141,10 +149,10 @@ export default function AddExpenseModal({
             <input
               type="text"
               value={form.title}
-              onChange={(event) =>
-                updateField("title", event.target.value)
+              onChange={(e) =>
+                updateField("title", e.target.value)
               }
-              placeholder="e.g. Decoration Materials"
+              placeholder="e.g. OTDR Repair / Fiber Patch Cables"
               className="h-11 w-full rounded-xl border border-[#ded5cb] bg-[#fdfbf8] px-3 text-sm outline-none focus:border-[#b8894b] focus:ring-2 focus:ring-[#b8894b]/10"
               required
             />
@@ -158,10 +166,10 @@ export default function AddExpenseModal({
 
               <select
                 value={form.category}
-                onChange={(event) =>
+                onChange={(e) =>
                   updateField(
                     "category",
-                    event.target.value as ExpenseCategory
+                    e.target.value as ExpenseCategory
                   )
                 }
                 className="h-11 w-full rounded-xl border border-[#ded5cb] bg-[#fdfbf8] px-3 text-sm outline-none focus:border-[#b8894b]"
@@ -186,10 +194,10 @@ export default function AddExpenseModal({
                 type="number"
                 min="1"
                 value={form.amount || ""}
-                onChange={(event) =>
+                onChange={(e) =>
                   updateField(
                     "amount",
-                    Number(event.target.value)
+                    Number(e.target.value)
                   )
                 }
                 placeholder="₹ 0"
@@ -201,49 +209,54 @@ export default function AddExpenseModal({
 
           <div>
             <label className="mb-1.5 block text-sm font-medium text-[#403a34]">
-              Associated Event
+              Network Zone / Location
             </label>
 
-            {events.length > 0 ? (
+            {activeZones.length > 0 ? (
               <div className="space-y-2">
                 <select
-                  value={form.eventId || (form.event ? "custom" : "")}
+                  value={form.zoneId || form.eventId || (form.zoneName || form.event ? "custom" : "")}
                   onChange={(e) => {
                     const selectedId = e.target.value;
                     if (selectedId === "custom") {
+                      updateField("zoneId", "");
                       updateField("eventId", "");
                     } else {
-                      const matched = events.find((ev) => ev.id === selectedId);
+                      const matched = activeZones.find((z) => z.id === selectedId);
                       if (matched) {
                         setForm((curr) => ({
                           ...curr,
+                          zoneId: matched.id,
                           eventId: matched.id,
+                          zoneName: matched.name,
                           event: matched.name,
                         }));
                       } else {
+                        updateField("zoneId", "");
                         updateField("eventId", "");
                       }
                     }
                   }}
                   className="h-11 w-full rounded-xl border border-[#ded5cb] bg-[#fdfbf8] px-3 text-sm outline-none focus:border-[#b8894b]"
                 >
-                  <option value="">Select an active event</option>
-                  {events.map((evt) => (
-                    <option key={evt.id} value={evt.id}>
-                      {evt.name}
+                  <option value="">Select a Network Zone</option>
+                  {activeZones.map((z) => (
+                    <option key={z.id} value={z.id}>
+                      {z.name}
                     </option>
                   ))}
-                  <option value="custom">Other / Custom Event Name</option>
+                  <option value="custom">General / Custom Location</option>
                 </select>
 
-                {(!form.eventId || form.eventId === "custom") && (
+                {(!form.zoneId && !form.eventId || form.zoneId === "custom") && (
                   <input
                     type="text"
-                    value={form.event}
-                    onChange={(event) =>
-                      updateField("event", event.target.value)
-                    }
-                    placeholder="Enter custom event name"
+                    value={form.zoneName || form.event || ""}
+                    onChange={(e) => {
+                      updateField("zoneName", e.target.value);
+                      updateField("event", e.target.value);
+                    }}
+                    placeholder="Enter zone or site name"
                     className="h-11 w-full rounded-xl border border-[#ded5cb] bg-[#fdfbf8] px-3 text-sm outline-none focus:border-[#b8894b]"
                     required
                   />
@@ -252,11 +265,12 @@ export default function AddExpenseModal({
             ) : (
               <input
                 type="text"
-                value={form.event}
-                onChange={(event) =>
-                  updateField("event", event.target.value)
-                }
-                placeholder="e.g. Wedding Celebration"
+                value={form.zoneName || form.event || ""}
+                onChange={(e) => {
+                  updateField("zoneName", e.target.value);
+                  updateField("event", e.target.value);
+                }}
+                placeholder="e.g. North Hub - Ward 12"
                 className="h-11 w-full rounded-xl border border-[#ded5cb] bg-[#fdfbf8] px-3 text-sm outline-none focus:border-[#b8894b]"
                 required
               />

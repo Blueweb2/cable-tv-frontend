@@ -3,7 +3,8 @@ export type DutyStatus = "Pending" | "In Progress" | "Completed";
 export interface StaffDuty {
   id: string;
   title: string;
-  eventName: string;
+  zoneName?: string;
+  eventName?: string;
   event?: string;
   date: string;
   eventDate?: string;
@@ -19,45 +20,48 @@ export interface StaffDuty {
 export const staffDuties: StaffDuty[] = [
   {
     id: "DUTY-001",
-    title: "Audio/Visual Console Coordination",
-    eventName: "Annual Corporate Gala 2026",
-    event: "Annual Corporate Gala 2026",
+    title: "Fiber Backbone Splice & OTDR Test",
+    zoneName: "North Sector FTTH (Z-NORTH)",
+    eventName: "North Sector FTTH",
+    event: "North Sector FTTH",
     date: "18 Dec 2026",
     eventDate: "18 Dec 2026",
-    time: "4:00 PM - 10:30 PM",
-    eventTime: "4:00 PM - 10:30 PM",
-    location: "The Grand Hyatt, Ballroom A",
-    role: "Technical Crew Lead",
+    time: "9:00 AM - 1:00 PM",
+    eventTime: "9:00 AM - 1:00 PM",
+    location: "Pole 42, North Main Road",
+    role: "Fiber Splicing Technician",
     status: "In Progress",
     priority: "High",
-    description: "Manage sound checks, speaker microphones, presentation slides, and ambient lighting.",
+    description: "Repair severed 12-core drop cable and verify optical attenuation is below -19 dBm.",
   },
   {
     id: "DUTY-002",
-    title: "VIP Guest Welcoming & Escort",
-    eventName: "Royal Palace Wedding Reception",
-    event: "Royal Palace Wedding Reception",
+    title: "Subscriber ONT & Router Setup",
+    zoneName: "East Distribution Area (Z-EAST)",
+    eventName: "East Distribution Area",
+    event: "East Distribution Area",
     date: "20 Dec 2026",
     eventDate: "20 Dec 2026",
-    time: "5:00 PM - 9:00 PM",
-    eventTime: "5:00 PM - 9:00 PM",
-    location: "Royal Palace, North Gate",
-    role: "Guest Relations",
+    time: "2:00 PM - 4:00 PM",
+    eventTime: "2:00 PM - 4:00 PM",
+    location: "Flat 4B, Sunrise Heights",
+    role: "Installation Technician",
     status: "Pending",
     priority: "Medium",
-    description: "Coordinate guest check-in, seat VIP dignitaries, and manage reception ushering.",
+    description: "Install dual-band WiFi ONT, configure PPPoE credentials, and verify TV STB provisioning.",
   },
   {
     id: "DUTY-003",
-    title: "Stage Setup & Banner Assembly",
-    eventName: "Tech Convention Product Launch",
+    title: "Node 14 Amplifier Power Inspection",
+    zoneName: "Central Grid Station (Z-CENTRAL)",
+    eventName: "Central Grid Station",
     date: "22 Dec 2026",
-    time: "9:00 AM - 1:00 PM",
-    location: "Tech Convention Center, Hall 3",
-    role: "Floor Setup Staff",
+    time: "10:00 AM - 12:00 PM",
+    location: "Substation Box 14, Market Road",
+    role: "Line Maintenance Engineer",
     status: "Pending",
     priority: "Medium",
-    description: "Assemble stage backdrop, podium logos, exhibitor banners, and safety stanchions.",
+    description: "Check RF signal input/output levels and replace worn coax connectors on trunk line.",
   },
 ];
 
