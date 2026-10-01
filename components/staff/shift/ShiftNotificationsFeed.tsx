@@ -110,9 +110,9 @@ export default function ShiftNotificationsFeed({ assignments }: ShiftNotificatio
       const element = document.getElementById(item.targetId);
       if (element) {
         element.scrollIntoView({ behavior: "smooth", block: "center" });
-        element.classList.add("ring-2", "ring-[#9a6c37]", "ring-offset-2", "rounded-2xl", "transition-all", "duration-500");
+        element.classList.add("ring-2", "ring-cyan-400", "ring-offset-2", "ring-offset-[#090d16]", "rounded-2xl", "transition-all", "duration-500");
         setTimeout(() => {
-          element.classList.remove("ring-2", "ring-[#9a6c37]", "ring-offset-2", "transition-all", "duration-500");
+          element.classList.remove("ring-2", "ring-cyan-400", "ring-offset-2", "ring-offset-[#090d16]", "transition-all", "duration-500");
         }, 2200);
         return;
       }
@@ -128,12 +128,12 @@ export default function ShiftNotificationsFeed({ assignments }: ShiftNotificatio
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
-    <div className="rounded-2xl border border-[#e8e1d8] bg-white p-5 shadow-xs">
+    <div className="rounded-2xl border border-slate-800 bg-[#0f172a] p-5 shadow-sm">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-gray-100">
-        <div className="flex items-center gap-2 text-[#9a6c37]">
+      <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800">
+        <div className="flex items-center gap-2 text-cyan-400">
           <Bell size={18} />
-          <h2 className="text-base font-bold text-[#29241f]">Shift Reminders & Notifications</h2>
+          <h2 className="text-base font-bold text-white">Shift Reminders & Notifications</h2>
           {unreadCount > 0 && (
             <span className="rounded-full bg-rose-500 px-2 py-0.5 text-[10px] font-extrabold text-white">
               {unreadCount}
@@ -145,7 +145,7 @@ export default function ShiftNotificationsFeed({ assignments }: ShiftNotificatio
           <button
             type="button"
             onClick={() => setFilter(filter === "ALL" ? "UNREAD" : "ALL")}
-            className="text-xs font-semibold text-[#9a6c37] hover:underline"
+            className="text-xs font-semibold text-cyan-400 hover:underline"
           >
             {filter === "ALL" ? "Unread Only" : "Show All"}
           </button>
@@ -153,7 +153,7 @@ export default function ShiftNotificationsFeed({ assignments }: ShiftNotificatio
             <button
               type="button"
               onClick={markAllRead}
-              className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-800"
+              className="flex items-center gap-1 text-xs text-slate-400 hover:text-slate-200"
             >
               <CheckCheck size={14} />
               <span>Mark all read</span>
@@ -165,7 +165,7 @@ export default function ShiftNotificationsFeed({ assignments }: ShiftNotificatio
       {/* Feed List */}
       <div className="mt-4 space-y-3 max-h-96 overflow-y-auto pr-1">
         {filtered.length === 0 ? (
-          <p className="rounded-xl bg-[#fdfcfb] p-4 text-center text-xs text-gray-500">
+          <p className="rounded-xl bg-slate-900/50 p-4 text-center text-xs text-slate-500">
             No notifications found.
           </p>
         ) : (
@@ -173,19 +173,19 @@ export default function ShiftNotificationsFeed({ assignments }: ShiftNotificatio
             <div
               key={item.id}
               onClick={() => handleNotificationClick(item)}
-              className={`group flex items-start gap-3 rounded-xl border p-3.5 transition cursor-pointer hover:border-[#9a6c37] ${item.read
-                  ? "border-gray-100 bg-[#fdfcfb] text-gray-600 opacity-85"
-                  : "border-amber-200/80 bg-amber-50/40 text-gray-900 shadow-2xs"
+              className={`group flex items-start gap-3 rounded-xl border p-3.5 transition cursor-pointer hover:border-cyan-500/50 ${item.read
+                  ? "border-slate-800 bg-slate-900/50 text-slate-400 opacity-85"
+                  : "border-cyan-500/30 bg-cyan-950/20 text-slate-200 shadow-sm"
                 }`}
             >
               <div
-                className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition group-hover:scale-105 ${item.type === "ASSIGNMENT"
-                    ? "bg-amber-100 text-[#9a6c37]"
+                className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition group-hover:scale-105 border ${item.type === "ASSIGNMENT"
+                    ? "bg-amber-950/40 text-amber-400 border-amber-500/30"
                     : item.type === "CHECKLIST"
-                      ? "bg-emerald-100 text-emerald-800"
+                      ? "bg-emerald-950/40 text-emerald-400 border-emerald-500/30"
                       : item.type === "REMINDER"
-                        ? "bg-blue-100 text-blue-700"
-                        : "bg-purple-100 text-purple-700"
+                        ? "bg-blue-950/40 text-blue-400 border-blue-500/30"
+                        : "bg-purple-950/40 text-purple-400 border-purple-500/30"
                   }`}
               >
                 {item.type === "ASSIGNMENT" ? (
@@ -201,15 +201,15 @@ export default function ShiftNotificationsFeed({ assignments }: ShiftNotificatio
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
-                  <h4 className={`text-xs font-bold ${item.read ? "text-gray-700" : "text-[#29241f]"}`}>
+                  <h4 className={`text-xs font-bold ${item.read ? "text-slate-400" : "text-white"}`}>
                     {item.title}
                   </h4>
-                  <span className="text-[10px] text-gray-400 shrink-0">{item.timestamp}</span>
+                  <span className="text-[10px] text-slate-500 shrink-0">{item.timestamp}</span>
                 </div>
-                <p className="mt-1 text-xs leading-5 text-gray-600">{item.message}</p>
+                <p className="mt-1 text-xs leading-5 text-slate-400">{item.message}</p>
 
                 {item.actionText && (
-                  <div className="mt-2 flex items-center gap-1 text-[11px] font-extrabold text-[#9a6c37] group-hover:underline">
+                  <div className="mt-2 flex items-center gap-1 text-[11px] font-extrabold text-cyan-400 group-hover:underline">
                     <span>{item.actionText}</span>
                   </div>
                 )}

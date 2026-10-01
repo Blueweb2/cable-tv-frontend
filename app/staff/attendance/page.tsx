@@ -146,16 +146,16 @@ export default function StaffAttendancePage() {
   };
 
   return (
-    <main className="space-y-6 py-5 sm:space-y-8 sm:py-6">
+    <main className="space-y-6 py-5 sm:space-y-8 sm:py-6 text-slate-100">
       {/* Header */}
-      <header className="border-b border-[#e8e1d8] pb-6">
-        <p className="text-xs font-semibold uppercase tracking-wider text-[#9a6c37]">
+      <header className="border-b border-slate-800 pb-6">
+        <p className="text-xs font-semibold uppercase tracking-wider text-cyan-400">
           Staff Portal
         </p>
-        <h1 className="mt-1 text-2xl font-bold text-[#29241f] sm:text-3xl">
+        <h1 className="mt-1 text-2xl font-bold text-white sm:text-3xl">
           Check In & Shift Attendance
         </h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-[#756d64]">
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
           Record attendance, check in to assigned event duties, and view shift history.
         </p>
       </header>
@@ -163,14 +163,14 @@ export default function StaffAttendancePage() {
       {error && (
         <div
           role="alert"
-          className="flex items-center gap-3 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-xs text-red-700"
+          className="flex items-center gap-3 rounded-xl border border-red-500/30 bg-red-950/40 px-4 py-3 text-xs text-red-300"
         >
           <AlertCircle size={16} />
           <span className="flex-1">{error}</span>
           <button
             type="button"
             onClick={() => void loadAttendance()}
-            className="font-semibold underline"
+            className="font-semibold underline text-cyan-400"
           >
             Retry
           </button>
@@ -178,8 +178,8 @@ export default function StaffAttendancePage() {
       )}
 
       {loading ? (
-        <div className="flex min-h-64 items-center justify-center rounded-2xl border border-[#e8e1d8] bg-white">
-          <Loader2 size={28} className="animate-spin text-[#9a6c37]" />
+        <div className="flex min-h-64 items-center justify-center rounded-2xl border border-slate-800 bg-[#0f172a]">
+          <Loader2 size={28} className="animate-spin text-cyan-400" />
         </div>
       ) : (
         <>
@@ -350,7 +350,7 @@ export default function StaffAttendancePage() {
                                   [assignment._id]: e.target.value,
                                 }))
                               }
-                              className="h-8 w-full sm:w-48 rounded-lg border border-[#e3dbd2] bg-white px-2.5 text-[11px] outline-none focus:border-[#9a6c37]"
+                              className="h-8 w-full sm:w-48 rounded-lg border border-slate-700 bg-slate-900/50 px-2.5 text-[11px] outline-none focus:border-cyan-500 text-slate-200"
                             />
                           )}
 
@@ -366,8 +366,8 @@ export default function StaffAttendancePage() {
                             }
                             className={`min-h-10 w-full sm:w-auto rounded-xl px-5 text-xs font-bold text-white shadow-sm transition disabled:cursor-not-allowed disabled:opacity-40 ${
                               isCheckedIn
-                                ? "bg-[#557555] hover:bg-[#456345]"
-                                : "bg-[#9a6c37] hover:bg-[#7e582d]"
+                                ? "bg-rose-600 hover:bg-rose-500 shadow-rose-900/40"
+                                : "bg-cyan-600 hover:bg-cyan-500 shadow-cyan-900/40 text-slate-950"
                             }`}
                           >
                             {actionId === assignment._id ? (
@@ -379,8 +379,8 @@ export default function StaffAttendancePage() {
                               </>
                             ) : (
                               <>
-                                <LogIn size={14} className="mr-1.5 inline" />
-                                Check In Shift
+                                <LogIn size={14} className="mr-1.5 inline text-slate-950" />
+                                <span className="text-slate-950">Check In Shift</span>
                               </>
                             )}
                           </button>
@@ -388,7 +388,7 @@ export default function StaffAttendancePage() {
                       </div>
 
                       {record?.checkIn && (
-                        <div className="mt-3 border-t border-black/5 pt-2.5 text-[11px] text-gray-500 flex flex-wrap justify-between">
+                        <div className="mt-3 border-t border-slate-800 pt-2.5 text-[11px] text-slate-500 flex flex-wrap justify-between">
                           <span>
                             Logged: In {timeLabel(record.checkIn)}
                             {record.checkOut
@@ -396,7 +396,7 @@ export default function StaffAttendancePage() {
                               : ""}
                           </span>
                           {record.notes && (
-                            <span className="font-medium text-amber-800">
+                            <span className="font-medium text-amber-500">
                               Note: {record.notes}
                             </span>
                           )}
@@ -410,37 +410,37 @@ export default function StaffAttendancePage() {
           </section>
 
           {/* Attendance History */}
-          <section className="rounded-2xl border border-[#e8e1d8] bg-white shadow-sm">
-            <div className="border-b border-[#eee8e1] px-5 py-4">
-              <h2 className="text-base font-bold text-[#29241f]">
+          <section className="rounded-2xl border border-slate-800 bg-[#0f172a] shadow-sm">
+            <div className="border-b border-slate-800 px-5 py-4">
+              <h2 className="text-base font-bold text-white">
                 Attendance History Logs
               </h2>
-              <p className="mt-0.5 text-xs text-[#8d847b]">
+              <p className="mt-0.5 text-xs text-slate-400">
                 Recent recorded duty attendance entries
               </p>
             </div>
-            <div className="divide-y divide-[#eee8e1]">
+            <div className="divide-y divide-slate-800">
               {attendance.length === 0 ? (
-                <p className="p-5 text-xs text-gray-500">
+                <p className="p-5 text-xs text-slate-500">
                   No attendance records logged yet.
                 </p>
               ) : (
                 attendance.slice(0, 10).map((record) => (
                   <div
                     key={record._id}
-                    className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between hover:bg-[#faf8f5] transition"
+                    className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between hover:bg-slate-900/50 transition"
                   >
                     <div>
-                      <p className="text-xs font-bold text-[#29241f]">
+                      <p className="text-xs font-bold text-white">
                         {typeof record.duty === "string"
                           ? "Duty attendance"
                           : record.duty?.dutyTitle || "Duty attendance"}
                       </p>
-                      <p className="mt-0.5 text-[11px] text-[#756d64]">
+                      <p className="mt-0.5 text-[11px] text-slate-400">
                         {dateLabel(record.date)} · In {timeLabel(record.checkIn)} · Out {timeLabel(record.checkOut)}
                       </p>
                     </div>
-                    <span className="w-fit rounded-full bg-[#edf5ed] px-3 py-0.5 text-[10px] font-bold text-[#557555] border border-emerald-200">
+                    <span className="w-fit rounded-full bg-emerald-500/20 px-3 py-0.5 text-[10px] font-bold text-emerald-400 border border-emerald-500/30">
                       {record.status}
                     </span>
                   </div>
@@ -466,17 +466,17 @@ function Summary({
   icon: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-[#e8e1d8] bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:p-5">
+    <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:p-5">
       <div className="flex items-center justify-between">
-        <p className="text-[10px] font-bold uppercase tracking-wider text-[#8d847b]">
+        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
           {label}
         </p>
         {icon}
       </div>
-      <p className="mt-2 text-2xl font-extrabold tracking-tight text-[#29241f]">
+      <p className="mt-2 text-2xl font-extrabold tracking-tight text-white">
         {value}
       </p>
-      <p className="mt-0.5 text-[10px] text-gray-400">{subtext}</p>
+      <p className="mt-0.5 text-[10px] text-slate-500">{subtext}</p>
     </div>
   );
 }

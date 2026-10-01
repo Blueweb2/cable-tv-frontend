@@ -307,7 +307,7 @@ export default function StaffDutiesPage() {
         </div>
 
         {/* Status Filters */}
-        <div className="flex items-center gap-1.5 rounded-2xl bg-slate-900/90 border border-slate-800 p-1.5">
+        <div className="flex items-center gap-1.5 rounded-2xl bg-slate-900/90 border border-slate-800 p-1.5 overflow-x-auto whitespace-nowrap max-w-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {(
             [
               { id: "ALL", label: "All Orders", count: localDuties.length },
@@ -320,7 +320,7 @@ export default function StaffDutiesPage() {
               key={tab.id}
               type="button"
               onClick={() => setStatusFilter(tab.id)}
-              className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition cursor-pointer ${statusFilter === tab.id
+              className={`flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition cursor-pointer ${statusFilter === tab.id
                   ? "bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20"
                   : "text-slate-400 hover:text-white"
                 }`}

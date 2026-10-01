@@ -34,25 +34,25 @@ export default function StaffStats({
       label: "Pending Duties",
       value: pending,
       icon: ClipboardList,
-      color: "text-amber-600 bg-amber-50",
+      color: "text-amber-400 bg-amber-950/40 border border-amber-500/30",
     },
     {
       label: "Assigned Events",
       value: eventCount,
       icon: CalendarDays,
-      color: "text-blue-600 bg-blue-50",
+      color: "text-blue-400 bg-blue-950/40 border border-blue-500/30",
     },
     {
       label: "Completed",
       value: completed,
       icon: CheckCircle2,
-      color: "text-emerald-600 bg-emerald-50",
+      color: "text-emerald-400 bg-emerald-950/40 border border-emerald-500/30",
     },
     {
       label: "Recorded Hours",
       value: `${hours.toFixed(1)}h`,
       icon: Clock3,
-      color: "text-purple-600 bg-purple-50",
+      color: "text-purple-400 bg-purple-950/40 border border-purple-500/30",
     },
   ];
 
@@ -63,10 +63,10 @@ export default function StaffStats({
         return (
           <div
             key={stat.label}
-            className="flex flex-col justify-between rounded-2xl border border-[#e8e1d8] bg-white p-3.5 sm:p-4 shadow-xs"
+            className="flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-900/50 p-3.5 sm:p-4 shadow-sm"
           >
             <div className="flex items-center justify-between gap-1.5">
-              <span className="truncate text-[11px] font-semibold text-gray-500">
+              <span className="truncate text-[11px] font-semibold text-slate-400">
                 {stat.label}
               </span>
               <div
@@ -75,7 +75,7 @@ export default function StaffStats({
                 <Icon size={15} />
               </div>
             </div>
-            <p className="mt-2 text-xl font-black text-[#29241f] sm:text-2xl">
+            <p className="mt-2 text-xl font-black text-white sm:text-2xl">
               {stat.value}
             </p>
           </div>
