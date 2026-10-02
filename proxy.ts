@@ -14,6 +14,10 @@ export function proxy(request: NextRequest) {
       loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
     }
+    // Prevent staff from accessing manager portal
+    if (userRole === "staff") {
+      return NextResponse.redirect(new URL("/staff", request.url));
+    }
   }
 
   // Protect Staff routes
@@ -27,7 +31,7 @@ export function proxy(request: NextRequest) {
 
   // Redirect logged-in users away from /login
   if (pathname === "/login" && token) {
-    if (userRole === "manager") {
+    if (userRole === "manager" || userRole === "admin") {
       return NextResponse.redirect(new URL("/manager", request.url));
     }
     if (userRole === "staff") {

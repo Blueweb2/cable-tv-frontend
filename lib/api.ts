@@ -1,4 +1,4 @@
-import { getAuthToken } from "@/lib/auth-storage";
+import { clearAuth, getAuthToken } from "@/lib/auth-storage";
 
 const getNormalizedApiUrl = () => {
   const envUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
@@ -47,6 +47,15 @@ export async function api<T>(
   }
 
   if (!response.ok) {
+    if (response.status === 401 && typeof window !== "undefined") {
+      // Don't auto-clear or redirect if already on login page to prevent redirect loops
+      if (!window.location.pathname.startsWith("/login")) {
+        clearAuth();
+        const currentPath = encodeURIComponent(window.location.pathname);
+        window.location.href = `/login?redirect=${currentPath}`;
+      }
+    }
+
     const message =
       data?.message ||
       data?.error ||
