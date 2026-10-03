@@ -95,3 +95,48 @@ export async function getDepartmentAvailability(
     token
   );
 }
+
+export interface StaffRecommendation {
+  _id: string;
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  department?: string;
+  specialization?: string;
+  location?: string;
+  employeeId?: string;
+  matchScore: number;
+  availabilityStatus: string;
+  activeDutiesCount: number;
+  matchReasons: string[];
+}
+
+export interface RecommendationQueryParams {
+  department?: string;
+  specialization?: string;
+  jobType?: string;
+  serviceName?: string;
+  zone?: string;
+  date?: string;
+}
+
+/**
+ * Get intelligent technician recommendations for field duty assignment
+ */
+export async function getStaffRecommendations(
+  params?: RecommendationQueryParams,
+  token?: string
+): Promise<ApiResponse<StaffRecommendation[]>> {
+  const queryParts: string[] = [];
+  if (params?.department) queryParts.push(`department=${encodeURIComponent(params.department)}`);
+  if (params?.specialization) queryParts.push(`specialization=${encodeURIComponent(params.specialization)}`);
+  if (params?.jobType) queryParts.push(`jobType=${encodeURIComponent(params.jobType)}`);
+  if (params?.serviceName) queryParts.push(`serviceName=${encodeURIComponent(params.serviceName)}`);
+  if (params?.zone) queryParts.push(`zone=${encodeURIComponent(params.zone)}`);
+  if (params?.date) queryParts.push(`date=${encodeURIComponent(params.date)}`);
+
+  const qs = queryParts.length > 0 ? `?${queryParts.join("&")}` : "";
+  return get<ApiResponse<StaffRecommendation[]>>(`/departments/recommendations${qs}`, token);
+}
+

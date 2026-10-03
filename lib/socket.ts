@@ -1,4 +1,5 @@
 import { io, Socket } from "socket.io-client";
+import { getAuthToken } from "./auth-storage";
 
 // Extract base URL for Socket.IO from frontend API environment variable
 const getSocketUrl = (): string => {
@@ -9,13 +10,18 @@ const getSocketUrl = (): string => {
 // Singleton instance to prevent multiple connections across React renders
 let socket: Socket | null = null;
 
-export const getSocket = (): Socket | null => {
+export const getSocket = (token?: string): Socket | null => {
   if (typeof window === "undefined") {
     return null;
   }
 
+  const authToken = token || getAuthToken();
+
   if (!socket) {
     socket = io(getSocketUrl(), {
+      auth: {
+        token: authToken || undefined,
+      },
       autoConnect: true,
       reconnection: true,
       reconnectionAttempts: Infinity,
@@ -24,9 +30,18 @@ export const getSocket = (): Socket | null => {
       timeout: 20000,
       transports: ["websocket", "polling"],
     });
+  } else if (authToken && socket.auth) {
+    socket.auth = { token: authToken };
   }
 
   return socket;
+};
+
+export const disconnectSocket = (): void => {
+  if (socket) {
+    socket.disconnect();
+    socket = null;
+  }
 };
 
 export default getSocket;

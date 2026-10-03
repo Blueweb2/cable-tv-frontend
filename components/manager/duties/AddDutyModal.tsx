@@ -13,14 +13,23 @@ import {
   MapPin,
   FileText,
   Zap,
+  Users,
+  CheckCircle2,
 } from "lucide-react";
 import type { Duty } from "./constants";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  getStaffRecommendations,
+  type StaffRecommendation,
+} from "@/lib/department.api";
 
 export type DutyFormValues = {
   zone?: string;
   zoneName?: string;
   nodeNumber?: string;
   staff: string;
+  assignedStaff?: string[];
+  specializationRequired?: string;
   dutyTitle: string;
   jobType?: string;
   priority?: string;
@@ -56,7 +65,6 @@ export type DutyFormValues = {
   endTime: string;
   hourlyRate?: number;
   checklist?: Array<{ _id?: string; text: string; completed: boolean }>;
-  event?: string;
 };
 
 type ZoneOption = { id: string; name: string; code: string; coverageArea?: string };
@@ -181,6 +189,28 @@ export default function AddDutyModal({
       checklist: CHECKLIST_PRESETS.FIBER_SPLICING.map((text) => ({ text, completed: false })),
     };
   });
+
+  const { token } = useAuth();
+  const [recommendations, setRecommendations] = useState<StaffRecommendation[]>([]);
+  const [loadingRecs, setLoadingRecs] = useState(false);
+
+  useEffect(() => {
+    if (!token || !open) return;
+    setLoadingRecs(true);
+    getStaffRecommendations(
+      {
+        jobType: form.jobType,
+        zone: form.zone,
+        date: form.dutyDate,
+      },
+      token
+    )
+      .then((res) => {
+        if (res.data) setRecommendations(res.data);
+      })
+      .catch((err) => console.warn("Failed to load staff recommendations:", err))
+      .finally(() => setLoadingRecs(false));
+  }, [token, open, form.jobType, form.zone, form.dutyDate]);
 
   const [newCheckitem, setNewCheckitem] = useState("");
   const [activeTab, setActiveTab] = useState<"general" | "location" | "problem" | "checklist">("general");
@@ -396,9 +426,63 @@ export default function AddDutyModal({
                 </div>
               </div>
 
+              {/* Recommended Technicians Section */}
+              {recommendations.length > 0 && (
+                <div className="rounded-xl border border-sky-500/30 bg-sky-950/20 p-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-sky-400 flex items-center gap-1.5">
+                      <Zap size={14} className="text-amber-400" />
+                      Recommended Technicians ({form.jobType?.replace(/_/g, " ") || "Field Duty"})
+                    </span>
+                    {loadingRecs && <span className="text-[10px] text-slate-400 animate-pulse">Scoring staff...</span>}
+                  </div>
+
+                  <div className="mt-2.5 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {recommendations.slice(0, 4).map((rec) => {
+                      const recId = rec.id || rec._id;
+                      const isSelected = form.staff === recId;
+                      return (
+                        <button
+                          key={recId}
+                          type="button"
+                          onClick={() => setForm((prev) => ({ ...prev, staff: recId }))}
+                          className={`text-left p-2.5 rounded-lg border transition text-xs ${
+                            isSelected
+                              ? "border-sky-400 bg-sky-900/50 text-white shadow-sm ring-1 ring-sky-400"
+                              : "border-slate-800 bg-slate-900/60 text-slate-300 hover:border-slate-700 hover:bg-slate-800/80"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-white flex items-center gap-1.5">
+                              {rec.name}
+                              {isSelected && <CheckCircle2 size={13} className="text-sky-400" />}
+                            </span>
+                            <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                              {rec.matchScore > 0 ? `+${rec.matchScore} pts` : `${rec.matchScore} pts`}
+                            </span>
+                          </div>
+                          <div className="mt-1 flex items-center gap-2 text-[11px] text-slate-400">
+                            <span className="text-cyan-300 font-medium">{rec.specialization || "Technician"}</span>
+                            <span>•</span>
+                            <span className={rec.activeDutiesCount === 0 ? "text-emerald-400" : "text-amber-300"}>
+                              {rec.activeDutiesCount} active today
+                            </span>
+                          </div>
+                          {rec.matchReasons && rec.matchReasons.length > 0 && (
+                            <div className="mt-1 text-[10px] text-slate-400 truncate">
+                              ✓ {rec.matchReasons.slice(0, 2).join(" • ")}
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300">Assign Technician *</label>
+                  <label className="block text-xs font-semibold text-slate-300">Lead Technician *</label>
                   <select
                     required
                     value={form.staff}

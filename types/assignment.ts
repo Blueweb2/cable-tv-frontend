@@ -107,6 +107,8 @@ export type Assignment = {
   zoneName?: string;
   nodeNumber?: string;
   staff: string | AssignmentStaff;
+  assignedStaff?: Array<string | AssignmentStaff>;
+  specializationRequired?: string;
   dutyTitle: string;
   jobType?: JobType;
   priority?: PriorityLevel;
@@ -160,6 +162,8 @@ export type CreateAssignmentPayload = {
   zoneName?: string;
   nodeNumber?: string;
   staff: string;
+  assignedStaff?: string[];
+  specializationRequired?: string;
   dutyTitle: string;
   jobType?: JobType;
   priority?: PriorityLevel;

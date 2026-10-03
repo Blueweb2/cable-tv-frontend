@@ -6,32 +6,36 @@ import {
   Clock3,
   FileText,
   UserRound,
+  Radio,
+  Wrench,
+  AlertTriangle,
 } from "lucide-react";
 
 import type {
   Assignment,
   CreateAssignmentPayload,
   UpdateAssignmentPayload,
+  JobType,
+  PriorityLevel,
 } from "@/types/assignment";
 
 interface AssignmentFormProps {
   assignment?: Assignment | null;
-
   onSubmit: (
-    payload:
-      | CreateAssignmentPayload
-      | UpdateAssignmentPayload,
+    payload: CreateAssignmentPayload | UpdateAssignmentPayload
   ) => Promise<void>;
-
   onCancel: () => void;
-
   loading?: boolean;
 }
 
 interface FormState {
-  event: string;
+  zone: string;
+  zoneName: string;
+  nodeNumber: string;
   staff: string;
   dutyTitle: string;
+  jobType: JobType;
+  priority: PriorityLevel;
   role: string;
   description: string;
   dutyDate: string;
@@ -41,9 +45,13 @@ interface FormState {
 }
 
 const initialForm: FormState = {
-  event: "",
+  zone: "",
+  zoneName: "",
+  nodeNumber: "",
   staff: "",
   dutyTitle: "",
+  jobType: "GENERAL_SHIFT",
+  priority: "MEDIUM",
   role: "",
   description: "",
   dutyDate: "",
@@ -59,12 +67,8 @@ export default function AssignmentForm({
   loading = false,
 }: AssignmentFormProps) {
   const isEditing = Boolean(assignment);
-
-  const [form, setForm] =
-    useState<FormState>(initialForm);
-
-  const [error, setError] =
-    useState<string | null>(null);
+  const [form, setForm] = useState<FormState>(initialForm);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!assignment) {
@@ -73,45 +77,29 @@ export default function AssignmentForm({
     }
 
     setForm({
-      event:
-        typeof assignment.event === "string"
-          ? assignment.event
-          : assignment.event._id,
-
+      zone:
+        typeof assignment.zone === "string"
+          ? assignment.zone
+          : assignment.zone?._id || "",
+      zoneName: assignment.zoneName || "",
+      nodeNumber: assignment.nodeNumber || "",
       staff:
         typeof assignment.staff === "string"
           ? assignment.staff
-          : assignment.staff.id,
-
-      dutyTitle:
-        assignment.dutyTitle ?? "",
-
-      role:
-        assignment.role ?? "",
-
-      description:
-        assignment.description ?? "",
-
-      dutyDate:
-        formatDateForInput(
-          assignment.dutyDate,
-        ),
-
-      startTime:
-        assignment.startTime ?? "",
-
-      endTime:
-        assignment.endTime ?? "",
-
-      notes:
-        assignment.notes ?? "",
+          : assignment.staff.id || (assignment.staff as any)._id || "",
+      dutyTitle: assignment.dutyTitle ?? "",
+      jobType: assignment.jobType ?? "GENERAL_SHIFT",
+      priority: assignment.priority ?? "MEDIUM",
+      role: assignment.role ?? "",
+      description: assignment.description ?? "",
+      dutyDate: formatDateForInput(assignment.dutyDate),
+      startTime: assignment.startTime ?? "",
+      endTime: assignment.endTime ?? "",
+      notes: assignment.notes ?? "",
     });
   }, [assignment]);
 
-  const handleChange = (
-    field: keyof FormState,
-    value: string,
-  ) => {
+  const handleChange = (field: keyof FormState, value: string) => {
     setForm((current) => ({
       ...current,
       [field]: value,
@@ -122,20 +110,12 @@ export default function AssignmentForm({
     }
   };
 
-  const handleSubmit = async (
-    event: React.FormEvent<HTMLFormElement>,
-  ) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     setError(null);
 
-    if (!form.event.trim()) {
-      setError("Please enter the event ID.");
-      return;
-    }
-
     if (!form.staff.trim()) {
-      setError("Please enter the staff ID.");
+      setError("Please enter the technician staff ID.");
       return;
     }
 
@@ -159,74 +139,63 @@ export default function AssignmentForm({
       return;
     }
 
-    if (form.endTime <= form.startTime) {
-      setError(
-        "End time must be later than start time.",
-      );
-      return;
-    }
-
     try {
       if (isEditing) {
         const payload: UpdateAssignmentPayload = {
+          zone: form.zone.trim() || undefined,
+          zoneName: form.zoneName.trim() || undefined,
+          nodeNumber: form.nodeNumber.trim() || undefined,
           staff: form.staff.trim(),
           dutyTitle: form.dutyTitle.trim(),
-          role:
-            form.role.trim() || undefined,
-          description:
-            form.description.trim() || undefined,
+          jobType: form.jobType,
+          priority: form.priority,
+          role: form.role.trim() || undefined,
+          description: form.description.trim() || undefined,
           dutyDate: form.dutyDate,
           startTime: form.startTime,
           endTime: form.endTime,
-          notes:
-            form.notes.trim() || undefined,
+          notes: form.notes.trim() || undefined,
         };
 
         await onSubmit(payload);
       } else {
         const payload: CreateAssignmentPayload = {
-          event: form.event.trim(),
+          zone: form.zone.trim() || undefined,
+          zoneName: form.zoneName.trim() || undefined,
+          nodeNumber: form.nodeNumber.trim() || undefined,
           staff: form.staff.trim(),
           dutyTitle: form.dutyTitle.trim(),
-          role:
-            form.role.trim() || undefined,
-          description:
-            form.description.trim() || undefined,
+          jobType: form.jobType,
+          priority: form.priority,
+          role: form.role.trim() || undefined,
+          description: form.description.trim() || undefined,
           dutyDate: form.dutyDate,
           startTime: form.startTime,
           endTime: form.endTime,
-          notes:
-            form.notes.trim() || undefined,
+          notes: form.notes.trim() || undefined,
         };
 
         await onSubmit(payload);
       }
     } catch (err) {
       setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to save assignment.",
+        err instanceof Error ? err.message : "Failed to save field assignment."
       );
     }
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-5"
-    >
+    <form onSubmit={handleSubmit} className="space-y-5 text-slate-100">
       {/* Header */}
       <div>
-        <h2 className="text-lg font-semibold text-[#1F1F1F]">
-          {isEditing
-            ? "Edit Assignment"
-            : "Create Assignment"}
+        <h2 className="text-lg font-bold text-white flex items-center gap-2">
+          <Wrench size={18} className="text-cyan-400" />
+          {isEditing ? "Edit Field Assignment" : "Dispatch Field Duty"}
         </h2>
-
-        <p className="mt-1 text-xs leading-5 text-gray-500">
+        <p className="mt-1 text-xs leading-5 text-slate-400">
           {isEditing
-            ? "Update the assignment details below."
-            : "Assign a staff member to an event."}
+            ? "Update work order assignment details and schedule."
+            : "Assign a field technician to network zone maintenance or client work order."}
         </p>
       </div>
 
@@ -234,191 +203,138 @@ export default function AssignmentForm({
       {error && (
         <div
           role="alert"
-          className="rounded-xl border border-red-100 bg-red-50 px-4 py-3"
+          className="rounded-xl border border-red-500/30 bg-red-950/40 px-4 py-3"
         >
-          <p className="text-xs leading-5 text-red-600">
-            {error}
-          </p>
+          <p className="text-xs leading-5 text-red-300">{error}</p>
         </div>
       )}
 
-      {/* Event */}
+      {/* Duty Title */}
       <div>
         <label
-          htmlFor="assignment-event"
-          className="mb-1.5 block text-xs font-medium text-gray-700"
+          htmlFor="assignment-duty-title"
+          className="mb-1.5 block text-xs font-semibold text-slate-300"
         >
-          Event
+          Duty / Work Order Title *
         </label>
+        <input
+          id="assignment-duty-title"
+          type="text"
+          required
+          value={form.dutyTitle}
+          onChange={(e) => handleChange("dutyTitle", e.target.value)}
+          disabled={loading}
+          placeholder="e.g. Fiber Core Splicing & Node Calibration"
+          className="h-11 w-full rounded-xl border border-slate-700 bg-slate-900 px-3 text-xs text-white outline-none focus:border-cyan-500 disabled:opacity-50"
+        />
+      </div>
 
-        <div className="relative">
-          <CalendarDays
-            size={17}
-            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
-          />
-
-          <input
-            id="assignment-event"
-            type="text"
-            value={form.event}
-            onChange={(e) =>
-              handleChange(
-                "event",
-                e.target.value,
-              )
-            }
-            disabled={isEditing || loading}
-            placeholder="Enter event ID"
-            className="h-12 w-full rounded-xl border border-gray-200 bg-white pl-10 pr-4 text-sm text-[#1F1F1F] outline-none placeholder:text-gray-400 focus:border-[#9A7B4F] focus:ring-2 focus:ring-[#9A7B4F]/10 disabled:bg-gray-50 disabled:text-gray-400"
-          />
+      {/* Job Type & Priority */}
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="mb-1.5 block text-xs font-semibold text-slate-300">
+            Job Category
+          </label>
+          <select
+            value={form.jobType}
+            onChange={(e) => handleChange("jobType", e.target.value)}
+            disabled={loading}
+            className="h-11 w-full rounded-xl border border-slate-700 bg-slate-900 px-3 text-xs text-white outline-none focus:border-cyan-500 disabled:opacity-50"
+          >
+            <option value="FIBER_SPLICING">Fiber Splicing & OTDR</option>
+            <option value="LINE_REPAIR">Line Repair & Drop Cable</option>
+            <option value="NEW_INSTALLATION">New FTTH & STB Setup</option>
+            <option value="NODE_MAINTENANCE">Node & Amplifier Maintenance</option>
+            <option value="SIGNAL_OPTIMIZATION">Signal Level Optimization</option>
+            <option value="PAYMENT_COLLECTION">Payment Collection</option>
+            <option value="GENERAL_SHIFT">General Field Shift</option>
+          </select>
         </div>
 
-        <p className="mt-1.5 text-[10px] text-gray-400">
-          Use the event ID from your events data.
-        </p>
+        <div>
+          <label className="mb-1.5 block text-xs font-semibold text-slate-300">
+            Priority Level
+          </label>
+          <select
+            value={form.priority}
+            onChange={(e) => handleChange("priority", e.target.value)}
+            disabled={loading}
+            className="h-11 w-full rounded-xl border border-slate-700 bg-slate-900 px-3 text-xs text-white outline-none focus:border-cyan-500 disabled:opacity-50"
+          >
+            <option value="LOW">Low Priority</option>
+            <option value="MEDIUM">Medium</option>
+            <option value="HIGH">High Priority</option>
+            <option value="CRITICAL_OUTAGE">Critical Outage</option>
+          </select>
+        </div>
       </div>
 
       {/* Staff */}
       <div>
         <label
           htmlFor="assignment-staff"
-          className="mb-1.5 block text-xs font-medium text-gray-700"
+          className="mb-1.5 block text-xs font-semibold text-slate-300"
         >
-          Staff
+          Technician ID *
         </label>
-
         <div className="relative">
           <UserRound
-            size={17}
-            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
+            size={16}
+            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
           />
-
           <input
             id="assignment-staff"
             type="text"
+            required
             value={form.staff}
-            onChange={(e) =>
-              handleChange(
-                "staff",
-                e.target.value,
-              )
-            }
+            onChange={(e) => handleChange("staff", e.target.value)}
             disabled={loading}
-            placeholder="Enter staff ID"
-            className="h-12 w-full rounded-xl border border-gray-200 bg-white pl-10 pr-4 text-sm text-[#1F1F1F] outline-none placeholder:text-gray-400 focus:border-[#9A7B4F] focus:ring-2 focus:ring-[#9A7B4F]/10 disabled:bg-gray-50 disabled:text-gray-400"
+            placeholder="Enter technician user ID"
+            className="h-11 w-full rounded-xl border border-slate-700 bg-slate-900 pl-10 pr-4 text-xs text-white outline-none focus:border-cyan-500 disabled:opacity-50"
+          />
+        </div>
+      </div>
+
+      {/* Date & Time */}
+      <div className="grid grid-cols-3 gap-3">
+        <div>
+          <label
+            htmlFor="assignment-date"
+            className="mb-1.5 block text-xs font-semibold text-slate-300"
+          >
+            Duty Date *
+          </label>
+          <input
+            id="assignment-date"
+            type="date"
+            required
+            value={form.dutyDate}
+            onChange={(e) => handleChange("dutyDate", e.target.value)}
+            disabled={loading}
+            className="h-11 w-full rounded-xl border border-slate-700 bg-slate-900 px-3 text-xs text-white outline-none focus:border-cyan-500 disabled:opacity-50"
           />
         </div>
 
-        <p className="mt-1.5 text-[10px] text-gray-400">
-          Use the staff ID from your staff records.
-        </p>
-      </div>
-
-      {/* Duty Title */}
-      <div>
-        <label
-          htmlFor="assignment-duty-title"
-          className="mb-1.5 block text-xs font-medium text-gray-700"
-        >
-          Duty Title
-        </label>
-
-        <input
-          id="assignment-duty-title"
-          type="text"
-          value={form.dutyTitle}
-          onChange={(e) =>
-            handleChange(
-              "dutyTitle",
-              e.target.value,
-            )
-          }
-          disabled={loading}
-          placeholder="e.g. Guest Reception"
-          className="h-12 w-full rounded-xl border border-gray-200 bg-white px-4 text-sm text-[#1F1F1F] outline-none placeholder:text-gray-400 focus:border-[#9A7B4F] focus:ring-2 focus:ring-[#9A7B4F]/10 disabled:bg-gray-50"
-        />
-      </div>
-
-      {/* Role */}
-      <div>
-        <label
-          htmlFor="assignment-role"
-          className="mb-1.5 block text-xs font-medium text-gray-700"
-        >
-          Role
-          <span className="ml-1 text-gray-400">
-            (Optional)
-          </span>
-        </label>
-
-        <input
-          id="assignment-role"
-          type="text"
-          value={form.role}
-          onChange={(e) =>
-            handleChange(
-              "role",
-              e.target.value,
-            )
-          }
-          disabled={loading}
-          placeholder="e.g. Receptionist"
-          className="h-12 w-full rounded-xl border border-gray-200 bg-white px-4 text-sm text-[#1F1F1F] outline-none placeholder:text-gray-400 focus:border-[#9A7B4F] focus:ring-2 focus:ring-[#9A7B4F]/10 disabled:bg-gray-50"
-        />
-      </div>
-
-      {/* Date */}
-      <div>
-        <label
-          htmlFor="assignment-date"
-          className="mb-1.5 block text-xs font-medium text-gray-700"
-        >
-          Duty Date
-        </label>
-
-        <input
-          id="assignment-date"
-          type="date"
-          value={form.dutyDate}
-          onChange={(e) =>
-            handleChange(
-              "dutyDate",
-              e.target.value,
-            )
-          }
-          disabled={loading}
-          className="h-12 w-full rounded-xl border border-gray-200 bg-white px-4 text-sm text-[#1F1F1F] outline-none focus:border-[#9A7B4F] focus:ring-2 focus:ring-[#9A7B4F]/10 disabled:bg-gray-50"
-        />
-      </div>
-
-      {/* Time */}
-      <div className="grid grid-cols-2 gap-3">
         <div>
           <label
             htmlFor="assignment-start-time"
-            className="mb-1.5 block text-xs font-medium text-gray-700"
+            className="mb-1.5 block text-xs font-semibold text-slate-300"
           >
-            Start Time
+            Start Time *
           </label>
-
           <div className="relative">
             <Clock3
-              size={16}
-              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
+              size={15}
+              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
             />
-
             <input
               id="assignment-start-time"
               type="time"
+              required
               value={form.startTime}
-              onChange={(e) =>
-                handleChange(
-                  "startTime",
-                  e.target.value,
-                )
-              }
+              onChange={(e) => handleChange("startTime", e.target.value)}
               disabled={loading}
-              className="h-12 w-full rounded-xl border border-gray-200 bg-white pl-10 pr-2 text-sm text-[#1F1F1F] outline-none focus:border-[#9A7B4F] focus:ring-2 focus:ring-[#9A7B4F]/10 disabled:bg-gray-50"
+              className="h-11 w-full rounded-xl border border-slate-700 bg-slate-900 pl-9 pr-2 text-xs text-white outline-none focus:border-cyan-500 disabled:opacity-50"
             />
           </div>
         </div>
@@ -426,29 +342,23 @@ export default function AssignmentForm({
         <div>
           <label
             htmlFor="assignment-end-time"
-            className="mb-1.5 block text-xs font-medium text-gray-700"
+            className="mb-1.5 block text-xs font-semibold text-slate-300"
           >
-            End Time
+            End Time *
           </label>
-
           <div className="relative">
             <Clock3
-              size={16}
-              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
+              size={15}
+              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
             />
-
             <input
               id="assignment-end-time"
               type="time"
+              required
               value={form.endTime}
-              onChange={(e) =>
-                handleChange(
-                  "endTime",
-                  e.target.value,
-                )
-              }
+              onChange={(e) => handleChange("endTime", e.target.value)}
               disabled={loading}
-              className="h-12 w-full rounded-xl border border-gray-200 bg-white pl-10 pr-2 text-sm text-[#1F1F1F] outline-none focus:border-[#9A7B4F] focus:ring-2 focus:ring-[#9A7B4F]/10 disabled:bg-gray-50"
+              className="h-11 w-full rounded-xl border border-slate-700 bg-slate-900 pl-9 pr-2 text-xs text-white outline-none focus:border-cyan-500 disabled:opacity-50"
             />
           </div>
         </div>
@@ -458,72 +368,28 @@ export default function AssignmentForm({
       <div>
         <label
           htmlFor="assignment-description"
-          className="mb-1.5 block text-xs font-medium text-gray-700"
+          className="mb-1.5 block text-xs font-semibold text-slate-300"
         >
-          Description
-          <span className="ml-1 text-gray-400">
-            (Optional)
-          </span>
+          Description / Special Instructions
         </label>
-
-        <div className="relative">
-          <FileText
-            size={17}
-            className="pointer-events-none absolute left-3.5 top-3.5 text-gray-400"
-          />
-
-          <textarea
-            id="assignment-description"
-            value={form.description}
-            onChange={(e) =>
-              handleChange(
-                "description",
-                e.target.value,
-              )
-            }
-            disabled={loading}
-            rows={3}
-            placeholder="Describe the staff duty..."
-            className="w-full resize-none rounded-xl border border-gray-200 bg-white py-3 pl-10 pr-4 text-sm text-[#1F1F1F] outline-none placeholder:text-gray-400 focus:border-[#9A7B4F] focus:ring-2 focus:ring-[#9A7B4F]/10 disabled:bg-gray-50"
-          />
-        </div>
-      </div>
-
-      {/* Notes */}
-      <div>
-        <label
-          htmlFor="assignment-notes"
-          className="mb-1.5 block text-xs font-medium text-gray-700"
-        >
-          Notes
-          <span className="ml-1 text-gray-400">
-            (Optional)
-          </span>
-        </label>
-
         <textarea
-          id="assignment-notes"
-          value={form.notes}
-          onChange={(e) =>
-            handleChange(
-              "notes",
-              e.target.value,
-            )
-          }
-          disabled={loading}
+          id="assignment-description"
           rows={3}
-          placeholder="Additional notes..."
-          className="w-full resize-none rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-[#1F1F1F] outline-none placeholder:text-gray-400 focus:border-[#9A7B4F] focus:ring-2 focus:ring-[#9A7B4F]/10 disabled:bg-gray-50"
+          value={form.description}
+          onChange={(e) => handleChange("description", e.target.value)}
+          disabled={loading}
+          placeholder="Detailed problem description or instructions for the technician..."
+          className="w-full rounded-xl border border-slate-700 bg-slate-900 p-3 text-xs text-white outline-none focus:border-cyan-500 disabled:opacity-50"
         />
       </div>
 
-      {/* Actions */}
-      <div className="flex gap-3 border-t border-gray-100 pt-4">
+      {/* Buttons */}
+      <div className="flex items-center justify-end gap-3 pt-2">
         <button
           type="button"
           onClick={onCancel}
           disabled={loading}
-          className="min-h-12 flex-1 rounded-xl border border-gray-200 bg-white px-4 text-sm font-medium text-gray-600 transition hover:bg-gray-50 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
+          className="h-10 rounded-xl border border-slate-700 px-4 text-xs font-semibold text-slate-300 hover:bg-slate-800 disabled:opacity-50"
         >
           Cancel
         </button>
@@ -531,51 +397,24 @@ export default function AssignmentForm({
         <button
           type="submit"
           disabled={loading}
-          className="min-h-12 flex-1 rounded-xl bg-[#1F1F1F] px-4 text-sm font-semibold text-white transition hover:bg-black active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
+          className="h-10 rounded-xl bg-cyan-600 px-5 text-xs font-bold text-slate-950 hover:bg-cyan-500 disabled:opacity-50 shadow-sm"
         >
           {loading
             ? "Saving..."
             : isEditing
-              ? "Save Changes"
-              : "Create Assignment"}
+            ? "Update Field Duty"
+            : "Dispatch Field Duty"}
         </button>
       </div>
     </form>
   );
 }
 
-/* ==========================================
-   HELPERS
-========================================== */
-
-function formatDateForInput(
-  date: string,
-): string {
-  if (!date) return "";
-
-  // Already in YYYY-MM-DD format
-  if (
-    /^\d{4}-\d{2}-\d{2}$/.test(date)
-  ) {
-    return date;
+function formatDateForInput(dateStr?: string) {
+  if (!dateStr) return "";
+  try {
+    return new Date(dateStr).toISOString().slice(0, 10);
+  } catch {
+    return dateStr.slice(0, 10);
   }
-
-  const parsedDate = new Date(date);
-
-  if (Number.isNaN(parsedDate.getTime())) {
-    return "";
-  }
-
-  const year =
-    parsedDate.getFullYear();
-
-  const month = String(
-    parsedDate.getMonth() + 1,
-  ).padStart(2, "0");
-
-  const day = String(
-    parsedDate.getDate(),
-  ).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
 }
