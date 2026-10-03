@@ -13,6 +13,7 @@ export * from "./service";
 export * from "./staff";
 export * from "./task";
 export * from "./zone";
+export * from "./inventory";
 
 /**
  * Unified MongoId Helper Type

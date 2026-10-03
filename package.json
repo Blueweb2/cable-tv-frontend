@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --test --experimental-strip-types lib/duty-mapper.test.ts lib/staff-management.test.ts"
+    "test": "node --test --experimental-strip-types lib/*.test.ts"
   },
   "dependencies": {
     "lucide-react": "^1.38.0",

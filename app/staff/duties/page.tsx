@@ -48,6 +48,7 @@ import CompleteTaskModal from "@/components/staff/shift/CompleteTaskModal";
 import SiteLocationCard from "@/components/staff/SiteLocationCard";
 import SitePhotosGallery from "@/components/staff/SitePhotosGallery";
 import SitePhotosUploadModal from "@/components/staff/SitePhotosUploadModal";
+import DutyMaterialsSection from "@/components/staff/DutyMaterialsSection";
 
 const getLocation = (): Promise<string> => {
   return new Promise((resolve) => {
@@ -598,6 +599,15 @@ export default function StaffDutiesPage() {
                     </div>
                   </div>
                 )}
+
+                {/* Duty Materials Section */}
+                <div className="mt-4">
+                  <DutyMaterialsSection
+                    dutyId={assignment._id}
+                    dutyTitle={assignment.dutyTitle}
+                    isCompleted={isCompleted}
+                  />
+                </div>
 
                 {/* Operations & Attendance Actions Bottom Bar */}
                 <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-slate-800/80 pt-4">

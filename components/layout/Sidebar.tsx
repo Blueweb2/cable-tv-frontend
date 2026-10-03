@@ -18,6 +18,7 @@ import {
   User,
   Activity,
   CheckCircle2,
+  Package,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -72,6 +73,11 @@ const managerItems: SidebarItem[] = [
     icon: Wallet,
   },
   {
+    label: "Material & Inventory",
+    href: "/manager/inventory",
+    icon: Package,
+  },
+  {
     label: "Payroll & Hourly Wages",
     href: "/manager/payroll",
     icon: IndianRupee,
@@ -98,6 +104,11 @@ const staffItems: SidebarItem[] = [
     label: "My Work Orders & Duties",
     href: "/staff/duties",
     icon: ClipboardList,
+  },
+  {
+    label: "Material Requests",
+    href: "/staff/inventory",
+    icon: Package,
   },
   {
     label: "Punch Clock & Shifts",
