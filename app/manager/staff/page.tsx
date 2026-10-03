@@ -94,7 +94,7 @@ export default function ManagerStaffPage() {
         ====================================== */}
         <PageHeader
           title="Staff"
-          description="Manage your event staff"
+          description="Manage CableOps field technicians and staff"
         />
 
         {/* =====================================

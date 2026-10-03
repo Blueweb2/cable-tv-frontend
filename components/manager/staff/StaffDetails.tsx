@@ -46,6 +46,15 @@ export default function StaffDetails({
           value={staff.name}
         />
 
+        {/* Employee ID */}
+        {staff.employeeId && (
+          <DetailRow
+            icon={UserRound}
+            label="Employee ID"
+            value={staff.employeeId}
+          />
+        )}
+
         {/* Role */}
         <DetailRow
           icon={BriefcaseBusiness}
@@ -59,6 +68,15 @@ export default function StaffDetails({
             icon={Building2}
             label="Department"
             value={staff.department}
+          />
+        )}
+
+        {/* Specialization */}
+        {staff.specialization && (
+          <DetailRow
+            icon={BriefcaseBusiness}
+            label="Specialization"
+            value={staff.specialization}
           />
         )}
 
@@ -80,14 +98,14 @@ export default function StaffDetails({
           />
         )}
 
-        {/* Events Assigned */}
+        {/* Duties Assigned */}
         <DetailRow
           icon={CalendarDays}
-          label="Events Assigned"
-          value={`${staff.eventsAssigned ?? 0} ${
-            (staff.eventsAssigned ?? 0) === 1
-              ? "event"
-              : "events"
+          label="Field Duties Assigned"
+          value={`${staff.dutiesAssigned ?? staff.eventsAssigned ?? 0} ${
+            (staff.dutiesAssigned ?? staff.eventsAssigned ?? 0) === 1
+              ? "duty"
+              : "duties"
           }`}
         />
 

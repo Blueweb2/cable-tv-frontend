@@ -1,4 +1,4 @@
-import { clearAuth, getAuthToken } from "@/lib/auth-storage";
+import { clearAuth, getAuthToken } from "./auth-storage.ts";
 
 const getNormalizedApiUrl = () => {
   const envUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";

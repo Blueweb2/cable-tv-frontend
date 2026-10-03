@@ -26,7 +26,9 @@ interface EditStaffModalProps {
 
 import {
   getDepartmentAndServiceOptions,
+  getSpecializationOptions,
   STANDARD_DEPARTMENTS,
+  STANDARD_SPECIALIZATIONS,
 } from "@/lib/department-options";
 
 export default function EditStaffModal({
@@ -42,10 +44,14 @@ export default function EditStaffModal({
       phone: staff.phone ?? "",
       role: staff.role ?? "",
       department: staff.department ?? "",
+      specialization: staff.specialization ?? "",
     });
 
   const [departmentOptions, setDepartmentOptions] =
     useState<string[]>(STANDARD_DEPARTMENTS);
+
+  const [specializationOptions, setSpecializationOptions] =
+    useState<string[]>(STANDARD_SPECIALIZATIONS);
 
   const [error, setError] =
     useState<string | null>(null);
@@ -68,9 +74,11 @@ export default function EditStaffModal({
       phone: staff.phone ?? "",
       role: staff.role ?? "",
       department: staff.department ?? "",
+      specialization: staff.specialization ?? "",
     });
 
     setError(null);
+    setSpecializationOptions(getSpecializationOptions(staff.specialization));
 
     void getDepartmentAndServiceOptions(staff.department).then((opts) => {
       setDepartmentOptions(opts);
@@ -123,9 +131,11 @@ export default function EditStaffModal({
     const name = formData.name.trim();
     const email = formData.email.trim();
     const phone = formData.phone.trim();
-    const role = formData.role.trim();
+    const role = formData.role.trim() || "Field Technician";
     const department =
       formData.department.trim();
+    const specialization =
+      formData.specialization.trim();
 
     if (!name) {
       setError("Name is required.");
@@ -137,11 +147,6 @@ export default function EditStaffModal({
       return;
     }
 
-    if (!role) {
-      setError("Role is required.");
-      return;
-    }
-
     const payload: UpdateStaffPayload = {
       name,
       email,
@@ -149,6 +154,8 @@ export default function EditStaffModal({
       role,
       department:
         department || undefined,
+      specialization:
+        specialization || undefined,
     };
 
     try {
@@ -203,7 +210,7 @@ export default function EditStaffModal({
             </h2>
 
             <p className="mt-0.5 text-xs text-gray-500">
-              Update staff information
+              Update technician / staff profile
             </p>
           </div>
 
@@ -300,7 +307,7 @@ export default function EditStaffModal({
                   event.target.value,
                 )
               }
-              placeholder="e.g. Event Staff"
+              placeholder="e.g. Field Technician"
               disabled={isSaving}
               className="h-11 w-full rounded-xl border border-gray-200 bg-white px-3.5 text-xs text-[#1F1F1F] outline-none transition focus:border-[#9A7B4F] focus:ring-2 focus:ring-[#9A7B4F]/10 disabled:cursor-not-allowed disabled:bg-gray-50"
             />
@@ -308,7 +315,7 @@ export default function EditStaffModal({
 
           {/* Department */}
           <FormField
-            label="Department / Service"
+            label="Department / Field Team"
             icon={Building2}
           >
             <select
@@ -322,15 +329,40 @@ export default function EditStaffModal({
               disabled={isSaving}
               className="h-11 w-full rounded-xl border border-gray-200 bg-white px-3.5 text-xs text-[#1F1F1F] outline-none transition focus:border-[#9A7B4F] focus:ring-2 focus:ring-[#9A7B4F]/10 disabled:cursor-not-allowed disabled:bg-gray-50 cursor-pointer"
             >
-              <option value="">Select a department or service...</option>
+              <option value="">Select a department...</option>
               {departmentOptions.map((opt) => (
                 <option key={opt} value={opt}>
                   {opt}
                 </option>
               ))}
             </select>
+          </FormField>
+
+          {/* Specialization */}
+          <FormField
+            label="Technician Specialization"
+            icon={BriefcaseBusiness}
+          >
+            <select
+              value={formData.specialization}
+              onChange={(event) =>
+                handleChange(
+                  "specialization",
+                  event.target.value,
+                )
+              }
+              disabled={isSaving}
+              className="h-11 w-full rounded-xl border border-gray-200 bg-white px-3.5 text-xs text-[#1F1F1F] outline-none transition focus:border-[#9A7B4F] focus:ring-2 focus:ring-[#9A7B4F]/10 disabled:cursor-not-allowed disabled:bg-gray-50 cursor-pointer"
+            >
+              <option value="">Select a specialization (optional)...</option>
+              {specializationOptions.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
+            </select>
             <p className="mt-1.5 text-[10px] text-gray-400">
-              Populated from active services configured in your Service Menu.
+              Used to match work orders and field fault dispatches to appropriate technicians.
             </p>
           </FormField>
 
@@ -391,6 +423,7 @@ interface FormData {
   phone: string;
   role: string;
   department: string;
+  specialization: string;
 }
 
 /* ==========================================

@@ -1,16 +1,23 @@
-import { getServices } from "./services.api";
+import { getServices } from "./services.api.ts";
 
 export const STANDARD_DEPARTMENTS = [
-  "Food & Catering",
-  "Food",
-  "Catering",
-  "Decoration",
-  "Sound & Lighting",
-  "Photography & Media",
-  "Security",
-  "Logistics",
-  "Hospitality",
-  "General Operations",
+  "Fiber Optics & Splicing",
+  "Field Linesmen & Wiring",
+  "Network Operations (NOC)",
+  "New Installations & STB Setup",
+  "Customer Support & Dispatch",
+  "Billing & Collection",
+  "General Field Operations",
+];
+
+export const STANDARD_SPECIALIZATIONS = [
+  "Fiber Technician",
+  "Linesman",
+  "Installation Technician",
+  "NOC Specialist",
+  "Support & Dispatch",
+  "Billing Agent",
+  "Field Technician",
 ];
 
 export async function getDepartmentAndServiceOptions(
@@ -26,7 +33,6 @@ export async function getDepartmentAndServiceOptions(
           optionsList.push(s.name.trim());
         }
         if (s.category?.trim()) {
-          // Format category neatly (e.g., "sound & lighting" -> "Sound & Lighting")
           const formattedCategory = s.category
             .trim()
             .split(" ")
@@ -45,4 +51,12 @@ export async function getDepartmentAndServiceOptions(
   }
 
   return Array.from(new Set(optionsList)).filter(Boolean).sort();
+}
+
+export function getSpecializationOptions(currentValue?: string): string[] {
+  const options = [...STANDARD_SPECIALIZATIONS];
+  if (currentValue?.trim() && !options.includes(currentValue.trim())) {
+    options.push(currentValue.trim());
+  }
+  return options;
 }

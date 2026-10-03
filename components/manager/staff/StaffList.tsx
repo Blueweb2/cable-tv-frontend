@@ -53,6 +53,12 @@ export default function StaffList({
   const [activeFilter, setActiveFilter] =
     useState<StaffFilter>("All");
 
+  const [selectedDepartment, setSelectedDepartment] =
+    useState<string>("");
+
+  const [selectedSpecialization, setSelectedSpecialization] =
+    useState<string>("");
+
   const [debouncedSearch, setDebouncedSearch] =
     useState("");
 
@@ -75,9 +81,6 @@ export default function StaffList({
    * Convert UI filter to the exact
    * StaffStatusFilter values used by
    * the API.
-   *
-   * Your type expects:
-   * "active" | "inactive"
    */
   const getStatusFilter =
     (): StaffFiltersType["status"] => {
@@ -102,6 +105,10 @@ export default function StaffList({
       search:
         debouncedSearch || undefined,
       status,
+      department:
+        selectedDepartment || undefined,
+      specialization:
+        selectedSpecialization || undefined,
       page: 1,
       limit: pagination.limit || 20,
     });
@@ -111,6 +118,8 @@ export default function StaffList({
   }, [
     debouncedSearch,
     activeFilter,
+    selectedDepartment,
+    selectedSpecialization,
   ]);
 
   /*
@@ -139,6 +148,26 @@ export default function StaffList({
     }
   };
 
+  const handleDepartmentChange = (
+    dept: string,
+  ) => {
+    setSelectedDepartment(dept);
+
+    if (error) {
+      onClearError();
+    }
+  };
+
+  const handleSpecializationChange = (
+    spec: string,
+  ) => {
+    setSelectedSpecialization(spec);
+
+    if (error) {
+      onClearError();
+    }
+  };
+
   /*
    * Clear filters.
    */
@@ -146,6 +175,8 @@ export default function StaffList({
     setSearch("");
     setDebouncedSearch("");
     setActiveFilter("All");
+    setSelectedDepartment("");
+    setSelectedSpecialization("");
 
     onClearError();
 
@@ -173,6 +204,10 @@ export default function StaffList({
       search:
         debouncedSearch || undefined,
       status: getStatusFilter(),
+      department:
+        selectedDepartment || undefined,
+      specialization:
+        selectedSpecialization || undefined,
       page: nextPage,
       limit: pagination.limit || 20,
     });
@@ -194,6 +229,10 @@ export default function StaffList({
       search:
         debouncedSearch || undefined,
       status: getStatusFilter(),
+      department:
+        selectedDepartment || undefined,
+      specialization:
+        selectedSpecialization || undefined,
       page: nextPage,
       limit: pagination.limit || 20,
     });
@@ -219,7 +258,7 @@ export default function StaffList({
               event.target.value,
             )
           }
-          placeholder="Search staff..."
+          placeholder="Search technicians by name, username, email, ID..."
           aria-label="Search staff"
           className="h-12 w-full rounded-2xl border border-gray-200 bg-white pl-10 pr-4 text-sm text-[#1F1F1F] outline-none transition placeholder:text-gray-400 focus:border-[#9A7B4F] focus:ring-2 focus:ring-[#9A7B4F]/10"
         />
@@ -230,8 +269,16 @@ export default function StaffList({
       ====================================== */}
       <StaffFilters
         activeFilter={activeFilter}
+        selectedDepartment={selectedDepartment}
+        selectedSpecialization={selectedSpecialization}
         onFilterChange={
           handleFilterChange
+        }
+        onDepartmentChange={
+          handleDepartmentChange
+        }
+        onSpecializationChange={
+          handleSpecializationChange
         }
       />
 

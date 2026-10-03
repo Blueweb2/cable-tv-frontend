@@ -37,6 +37,7 @@ interface FormData {
   phone: string;
   role: string;
   department: string;
+  specialization: string;
   password: string;
   confirmPassword: string;
 }
@@ -45,15 +46,18 @@ const initialFormData: FormData = {
   name: "",
   email: "",
   phone: "",
-  role: "",
+  role: "Field Technician",
   department: "",
+  specialization: "",
   password: "",
   confirmPassword: "",
 };
 
 import {
   getDepartmentAndServiceOptions,
+  getSpecializationOptions,
   STANDARD_DEPARTMENTS,
+  STANDARD_SPECIALIZATIONS,
 } from "@/lib/department-options";
 
 export default function AddStaffModal({
@@ -66,6 +70,9 @@ export default function AddStaffModal({
 
   const [departmentOptions, setDepartmentOptions] =
     useState<string[]>(STANDARD_DEPARTMENTS);
+
+  const [specializationOptions, setSpecializationOptions] =
+    useState<string[]>(STANDARD_SPECIALIZATIONS);
 
   const [error, setError] =
     useState<string | null>(null);
@@ -89,6 +96,7 @@ export default function AddStaffModal({
     setIsSaving(false);
     setShowPassword(false);
     setShowConfirmPassword(false);
+    setSpecializationOptions(getSpecializationOptions());
 
     void getDepartmentAndServiceOptions().then((opts) => {
       setDepartmentOptions(opts);
@@ -138,9 +146,11 @@ export default function AddStaffModal({
     const name = formData.name.trim();
     const email = formData.email.trim();
     const phone = formData.phone.trim();
-    const role = formData.role.trim();
+    const role = formData.role.trim() || "Field Technician";
     const department =
       formData.department.trim();
+    const specialization =
+      formData.specialization.trim();
     const password = formData.password;
     const confirmPassword =
       formData.confirmPassword;
@@ -152,11 +162,6 @@ export default function AddStaffModal({
 
     if (!email) {
       setError("Email is required.");
-      return;
-    }
-
-    if (!role) {
-      setError("Role is required.");
       return;
     }
 
@@ -191,6 +196,8 @@ export default function AddStaffModal({
       role,
       department:
         department || undefined,
+      specialization:
+        specialization || undefined,
       password,
     };
 
@@ -256,7 +263,7 @@ export default function AddStaffModal({
               </h2>
 
               <p className="mt-0.5 text-xs text-gray-500">
-                Create a new staff account
+                Create a new technician / staff account
               </p>
             </div>
           </div>
@@ -317,7 +324,7 @@ export default function AddStaffModal({
                   event.target.value,
                 )
               }
-              placeholder="Enter email address"
+              placeholder="e.g. rahul@cableops.com"
               autoComplete="email"
               disabled={isSaving}
               className="h-11 w-full rounded-xl border border-gray-200 bg-white px-3.5 text-xs text-[#1F1F1F] outline-none transition focus:border-[#9A7B4F] focus:ring-2 focus:ring-[#9A7B4F]/10 disabled:cursor-not-allowed disabled:bg-gray-50"
@@ -338,7 +345,7 @@ export default function AddStaffModal({
                   event.target.value,
                 )
               }
-              placeholder="Enter phone number"
+              placeholder="+91 98765 43210"
               autoComplete="tel"
               disabled={isSaving}
               className="h-11 w-full rounded-xl border border-gray-200 bg-white px-3.5 text-xs text-[#1F1F1F] outline-none transition focus:border-[#9A7B4F] focus:ring-2 focus:ring-[#9A7B4F]/10 disabled:cursor-not-allowed disabled:bg-gray-50"
@@ -360,7 +367,7 @@ export default function AddStaffModal({
                   event.target.value,
                 )
               }
-              placeholder="e.g. Event Staff"
+              placeholder="e.g. Field Technician"
               disabled={isSaving}
               className="h-11 w-full rounded-xl border border-gray-200 bg-white px-3.5 text-xs text-[#1F1F1F] outline-none transition focus:border-[#9A7B4F] focus:ring-2 focus:ring-[#9A7B4F]/10 disabled:cursor-not-allowed disabled:bg-gray-50"
             />
@@ -368,7 +375,7 @@ export default function AddStaffModal({
 
           {/* Department */}
           <FormField
-            label="Department / Service"
+            label="Department / Field Team"
             icon={Building2}
             required
           >
@@ -384,15 +391,40 @@ export default function AddStaffModal({
               required
               className="h-11 w-full rounded-xl border border-gray-200 bg-white px-3.5 text-xs text-[#1F1F1F] outline-none transition focus:border-[#9A7B4F] focus:ring-2 focus:ring-[#9A7B4F]/10 disabled:cursor-not-allowed disabled:bg-gray-50 cursor-pointer"
             >
-              <option value="">Select a department / service</option>
+              <option value="">Select a department...</option>
               {departmentOptions.map((dept) => (
                 <option key={dept} value={dept}>
                   {dept}
                 </option>
               ))}
             </select>
+          </FormField>
+
+          {/* Specialization */}
+          <FormField
+            label="Technician Specialization"
+            icon={BriefcaseBusiness}
+          >
+            <select
+              value={formData.specialization}
+              onChange={(event) =>
+                handleChange(
+                  "specialization",
+                  event.target.value,
+                )
+              }
+              disabled={isSaving}
+              className="h-11 w-full rounded-xl border border-gray-200 bg-white px-3.5 text-xs text-[#1F1F1F] outline-none transition focus:border-[#9A7B4F] focus:ring-2 focus:ring-[#9A7B4F]/10 disabled:cursor-not-allowed disabled:bg-gray-50 cursor-pointer"
+            >
+              <option value="">Select a specialization (optional)...</option>
+              {specializationOptions.map((spec) => (
+                <option key={spec} value={spec}>
+                  {spec}
+                </option>
+              ))}
+            </select>
             <p className="mt-1.5 text-[10px] text-gray-400">
-              Populated from active services configured in your Service Menu.
+              Used to match work orders and field fault dispatches to appropriate technicians.
             </p>
           </FormField>
 

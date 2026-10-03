@@ -26,6 +26,7 @@ interface StaffProfile {
   username?: string;
   employeeId?: string;
   department?: string;
+  specialization?: string;
   name: string;
   email: string;
   phone: string;
@@ -240,7 +241,7 @@ export default function StaffProfilePage() {
                   </div>
 
                   <p className="mt-1 text-xs font-semibold capitalize text-[#9a6c37]">
-                    {profile.role} · {profile.department || "Fiber & Field Operations"}
+                    {profile.specialization ? `${profile.specialization} · ` : ""}{profile.role} · {profile.department || "Fiber & Field Operations"}
                   </p>
 
                   {/* Meta information */}
@@ -335,6 +336,12 @@ export default function StaffProfilePage() {
                     icon={<Building size={16} />}
                     label="Department"
                     value={profile.department || "Fiber & Field Operations"}
+                  />
+
+                  <Info
+                    icon={<ShieldCheck size={16} />}
+                    label="Specialization"
+                    value={profile.specialization || "General Field Technician"}
                   />
 
                   <Info

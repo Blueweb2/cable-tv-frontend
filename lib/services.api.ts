@@ -1,17 +1,17 @@
-import {
+import type {
   Service,
   CreateServiceData,
   UpdateServiceData,
-} from "@/types/service";
+} from "../types/service.ts";
 
 import {
   get,
   post,
   put,
   del,
-  ApiResponse,
-} from "./api";
-import { getAuthToken } from "./auth-storage";
+} from "./api.ts";
+import type { ApiResponse } from "./api.ts";
+import { getAuthToken } from "./auth-storage.ts";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 

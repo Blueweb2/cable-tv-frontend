@@ -47,9 +47,14 @@ export default function StaffCard({
                 {staff.name}
               </h3>
 
-              <p className="mt-0.5 truncate text-xs text-gray-500">
-                {staff.role}
+              <p className="mt-0.5 truncate text-xs font-semibold text-[#9A7B4F]">
+                {staff.specialization || staff.department || staff.role}
               </p>
+              {staff.employeeId && (
+                <p className="mt-0.5 text-[10px] text-gray-400">
+                  {staff.employeeId}
+                </p>
+              )}
             </div>
 
             <ChevronRight
@@ -60,7 +65,7 @@ export default function StaffCard({
           </div>
 
           {/* Status */}
-          <div className="mt-2">
+          <div className="mt-2 flex flex-wrap items-center gap-2">
             <span
               className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-medium ${
                 isActive
@@ -78,6 +83,12 @@ export default function StaffCard({
 
               {isActive ? "Active" : "Inactive"}
             </span>
+
+            {staff.department && (
+              <span className="rounded-md bg-[#faf7f2] px-2 py-0.5 text-[10px] font-medium text-gray-600 border border-[#eee8e1]">
+                {staff.department}
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -123,10 +134,10 @@ export default function StaffCard({
           />
 
           <span>
-            {staff.eventsAssigned ?? 0}{" "}
-            {(staff.eventsAssigned ?? 0) === 1
-              ? "Event"
-              : "Events"}{" "}
+            {staff.dutiesAssigned ?? staff.eventsAssigned ?? 0}{" "}
+            {(staff.dutiesAssigned ?? staff.eventsAssigned ?? 0) === 1
+              ? "Duty"
+              : "Duties"}{" "}
             Assigned
           </span>
         </div>

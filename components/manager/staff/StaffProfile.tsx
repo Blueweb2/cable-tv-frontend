@@ -126,10 +126,15 @@ export default function StaffProfile({
             {staff.name}
           </h1>
 
-          {/* Role */}
-          <p className="mt-1 text-sm text-gray-500">
-            {staff.role}
+          {/* Role & Specialization */}
+          <p className="mt-1 text-sm font-semibold text-[#9A7B4F]">
+            {staff.specialization || staff.role}
           </p>
+          {staff.department && (
+            <p className="mt-0.5 text-xs text-gray-500">
+              {staff.department}
+            </p>
+          )}
 
           {/* Status */}
           <div className="mt-3">
@@ -145,13 +150,13 @@ export default function StaffProfile({
 
           {/* Staff ID */}
           <p className="mt-2 text-[11px] text-gray-400">
-            Staff ID: {staff.id}
+            {staff.employeeId ? `Employee ID: ${staff.employeeId} · ` : ""}Staff ID: {staff.id}
           </p>
         </div>
 
         {/* Quick Stats */}
         <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-3 border-t border-gray-100 pt-5">
-          {/* Events */}
+          {/* Duties */}
           <div className="rounded-xl bg-[#F8F7F3] p-3 text-center">
             <CalendarDays
               size={17}
@@ -159,9 +164,9 @@ export default function StaffProfile({
               strokeWidth={1.8}
             />
             <p className="mt-1.5 text-lg font-semibold text-[#1F1F1F]">
-              {staff.eventsAssigned ?? duties.length}
+              {staff.dutiesAssigned ?? staff.eventsAssigned ?? duties.length}
             </p>
-            <p className="text-[10px] text-gray-500">Shifts Logged</p>
+            <p className="text-[10px] text-gray-500">Field Duties Logged</p>
           </div>
 
           {/* Working Hours */}
@@ -220,7 +225,7 @@ export default function StaffProfile({
               : "text-gray-600 hover:text-gray-900"
           }`}
         >
-          Staff Profile & Settings
+          Technician Profile & Settings
         </button>
 
         <button
@@ -261,7 +266,7 @@ export default function StaffProfile({
             <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
               <Clock size={28} className="mx-auto text-gray-300" />
               <p className="mt-2 text-xs font-bold text-gray-700">No duty shifts assigned yet</p>
-              <p className="mt-1 text-[11px] text-gray-400">Assigned event shifts and covered duties will appear here.</p>
+              <p className="mt-1 text-[11px] text-gray-400">Assigned field shifts and covered duties will appear here.</p>
             </div>
           ) : (
             <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
@@ -270,8 +275,8 @@ export default function StaffProfile({
                   <thead className="border-b border-gray-100 bg-[#faf8f5] text-[11px] font-bold text-gray-600">
                     <tr>
                       <th className="px-4 py-3">Date</th>
-                      <th className="px-4 py-3">Event & Venue</th>
-                      <th className="px-4 py-3">Duty Covered</th>
+                      <th className="px-4 py-3">Network Zone & Site</th>
+                      <th className="px-4 py-3">Duty / Task Covered</th>
                       <th className="px-4 py-3">Hours</th>
                       <th className="px-4 py-3 text-right">Rate & Pay</th>
                       <th className="px-4 py-3 text-center">Shift Status</th>

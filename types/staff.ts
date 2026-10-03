@@ -49,6 +49,7 @@ export type Staff = {
 
   employeeId: string;
   department: string;
+  specialization?: string;
 
   employmentType: EmploymentType;
 
@@ -56,6 +57,7 @@ export type Staff = {
 
   avatar?: string;
 
+  dutiesAssigned?: number;
   eventsAssigned?: number;
 
   emergencyContact: EmergencyContact;
@@ -87,6 +89,7 @@ export type CreateStaffPayload = {
 
   employeeId?: string;
   department?: string;
+  specialization?: string;
 
   employmentType?: EmploymentType;
 
@@ -117,6 +120,7 @@ export type UpdateStaffPayload = {
 
   employeeId?: string;
   department?: string;
+  specialization?: string;
 
   emergencyContact?: {
     name?: string;
@@ -144,6 +148,7 @@ export type StaffFilters = {
   status?: StaffStatusFilter;
 
   department?: string;
+  specialization?: string;
 
   page?: number;
 
