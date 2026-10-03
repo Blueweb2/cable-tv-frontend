@@ -37,22 +37,22 @@ export default function StaffMoreMenu({ open, onClose }: StaffMoreMenuProps) {
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/40">
-      <div className="flex h-full w-[80%] max-w-xs flex-col bg-white p-5 shadow-2xl">
-        <div className="flex items-center justify-between border-b border-[#e8e1d8] pb-4">
+    <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm transition-opacity">
+      <div className="flex h-full w-[80%] max-w-xs flex-col bg-[#0f172a] border-l border-slate-800 p-5 shadow-2xl">
+        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#9a6c37] font-bold text-white">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-sky-600 to-cyan-500 font-bold text-white shadow-sm">
               {user?.name ? user.name.charAt(0).toUpperCase() : "S"}
             </div>
             <div>
-              <p className="text-sm font-bold text-gray-900">{user?.name || "Staff Member"}</p>
-              <p className="text-xs text-gray-400">{user?.email || "staff"}</p>
+              <p className="text-sm font-bold text-white">{user?.name || "Staff Member"}</p>
+              <p className="text-xs text-slate-400">{user?.email || "staff"}</p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1 text-gray-400 hover:text-gray-700"
+            className="rounded-lg p-1 text-slate-400 hover:bg-slate-800 hover:text-white transition"
           >
             <X size={20} />
           </button>
@@ -66,23 +66,23 @@ export default function StaffMoreMenu({ open, onClose }: StaffMoreMenuProps) {
                 key={item.href}
                 href={item.href}
                 onClick={onClose}
-                className="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-[#fbf6ef] hover:text-[#9a6c37]"
+                className="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium text-slate-300 transition hover:bg-slate-800/50 hover:text-sky-400"
               >
                 <div className="flex items-center gap-3">
                   <Icon size={18} />
                   <span>{item.label}</span>
                 </div>
-                <ChevronRight size={16} className="text-gray-400" />
+                <ChevronRight size={16} className="text-slate-500" />
               </Link>
             );
           })}
         </nav>
 
-        <div className="border-t border-[#e8e1d8] pt-4">
+        <div className="border-t border-slate-800 pt-4">
           <button
             type="button"
             onClick={handleLogout}
-            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-400 transition hover:bg-red-500/10"
           >
             <LogOut size={18} />
             <span>Sign Out</span>

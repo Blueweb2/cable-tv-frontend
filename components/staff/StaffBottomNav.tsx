@@ -25,8 +25,8 @@ export default function StaffBottomNav({ onMore }: StaffBottomNavProps) {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-[#e8e1d8] bg-white/95 backdrop-blur-md px-2 py-1.5 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] sm:px-6 lg:hidden shadow-lg">
-      <div className="mx-auto flex max-w-md items-center justify-around">
+    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-800 bg-[#090d16]/95 backdrop-blur-lg lg:hidden">
+      <div className="mx-auto flex h-16 max-w-md items-center justify-around px-2">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive =
@@ -38,16 +38,19 @@ export default function StaffBottomNav({ onMore }: StaffBottomNavProps) {
             <Link
               key={item.href}
               href={item.href}
-              className={`relative flex flex-1 flex-col items-center justify-center gap-1 rounded-2xl py-1 text-[10px] sm:text-[11px] font-bold transition-all duration-200 active:scale-95 ${
+              className={`flex min-w-14 flex-1 flex-col items-center justify-center gap-1 rounded-xl py-1 text-[11px] font-semibold transition active:scale-95 ${
                 isActive
-                  ? "text-[#9a6c37]"
-                  : "text-gray-400 hover:text-gray-800"
+                  ? "text-[#00d2ff]"
+                  : "text-slate-400 hover:text-slate-200"
               }`}
             >
-              {isActive && (
-                <span className="absolute inset-x-2 inset-y-0.5 rounded-2xl bg-[#9a6c37]/10 -z-10 animate-fade-in" />
-              )}
-              <Icon size={19} strokeWidth={isActive ? 2.4 : 1.8} />
+              <span
+                className={`flex h-8 w-10 items-center justify-center rounded-xl transition ${
+                  isActive ? "bg-sky-500/15 border border-sky-500/30 shadow-sm" : ""
+                }`}
+              >
+                <Icon size={19} strokeWidth={isActive ? 2.2 : 1.8} />
+              </span>
               <span>{item.label}</span>
             </Link>
           );
@@ -57,9 +60,11 @@ export default function StaffBottomNav({ onMore }: StaffBottomNavProps) {
           <button
             type="button"
             onClick={onMore}
-            className="flex flex-1 flex-col items-center justify-center gap-1 rounded-2xl py-1 text-[10px] sm:text-[11px] font-bold text-gray-400 hover:text-gray-800 transition active:scale-95 cursor-pointer"
+            className="flex min-w-14 flex-1 flex-col items-center justify-center gap-1 rounded-xl py-1 text-[11px] font-semibold text-slate-400 transition hover:text-slate-200 active:scale-95 cursor-pointer"
           >
-            <Menu size={19} />
+            <span className="flex h-8 w-10 items-center justify-center rounded-xl">
+              <Menu size={20} strokeWidth={1.8} />
+            </span>
             <span>More</span>
           </button>
         )}
